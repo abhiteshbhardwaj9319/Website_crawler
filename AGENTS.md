@@ -1,6 +1,6 @@
 # Project working agreement
 
-Build a website-grounded RAG assessment within a practical 1-2 day scope. The user has authorized complete implementation, milestone by milestone. Read `docs/implementation-scope.md` for the latest requirements: numbered isolated websites, polished CLI, OpenAI/Groq support, retrieval comparison, and local tracing. Application code has not yet been written at this handoff.
+Build a website-grounded RAG assessment within a practical 1-2 day scope. The user has authorized complete implementation, milestone by milestone. Read `docs/implementation-scope.md` for the latest requirements: numbered isolated websites, polished CLI, OpenAI/Groq support, retrieval comparison, and local tracing. Application code is implemented under `src/website_rag/` (see README for verified status).
 
 ## Resume work
 

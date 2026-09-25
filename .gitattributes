@@ -1,0 +1,4 @@
+# Keep LF everywhere so frozen evaluation files hash identically on every OS.
+* text=auto eol=lf
+*.png binary
+*.jpg binary

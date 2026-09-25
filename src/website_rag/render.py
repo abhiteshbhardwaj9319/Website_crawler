@@ -45,8 +45,8 @@ def safe(text: str | None, style: str = "") -> Text:
 def sites_table(sites: list[SiteRecord], selected: int | None = None) -> Table:
     table = Table(title="Websites", title_justify="left", header_style="bold", expand=False)
     table.add_column("#", justify="right", style="cyan")
-    table.add_column("Website")
-    table.add_column("Scope", style="dim")
+    table.add_column("Website", overflow="fold")
+    table.add_column("Scope", style="dim", overflow="fold")
     table.add_column("Status")
     table.add_column("Pages", justify="right")
     table.add_column("Chunks", justify="right")

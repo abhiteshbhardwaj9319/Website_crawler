@@ -1,6 +1,6 @@
 # Implementation scope and accepted direction
 
-Updated 2026-09-26. **Implementation authorized; application not yet implemented.** This amendment supersedes earlier single-corpus and planning-only restrictions. The existing milestone plan remains the execution structure.
+Updated 2026-09-26. **Implemented** (see [architecture](architecture.md) and the README status line for what is verified live). This amendment supersedes earlier single-corpus and planning-only restrictions and remains the requirement baseline.
 
 ## Required experience
 

@@ -1,0 +1,30 @@
+{
+  "split": "isolation",
+  "mode": "hybrid_rerank",
+  "provider_mode": null,
+  "cases": 5,
+  "answerable_cases": 1,
+  "evidence_groups": 1,
+  "recall@3": "1/1",
+  "recall@6": "1/1",
+  "recall@10": "1/1",
+  "recall@20": "1/1",
+  "context_recall": "1/1",
+  "multi_page_labeled_pages_in_context": "0/0",
+  "multi_page_complete": "0/0",
+  "mrr@20": 1.0,
+  "isolation_leaks": 0,
+  "retrieval_ms_mean": 1570.4,
+  "questions_sha256": "da1826b26b5f1766348965bc8ef22ba5d461e2711a05b3c72cd7feba488456fb",
+  "settings": {
+    "candidate_k": 20,
+    "context_max_chunks": 10,
+    "evidence_token_budget": 3000,
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "rrf_k": 60,
+    "openai_model": "gpt-4.1-mini-2025-04-14",
+    "groq_model": "openai/gpt-oss-120b"
+  },
+  "results_file": "20260925T230552_isolation_hybrid_rerank_retrieval.jsonl"
+}

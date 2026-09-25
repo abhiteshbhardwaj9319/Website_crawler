@@ -56,9 +56,9 @@ class Settings(BaseSettings):
     embedding_batch_size: int = Field(default=32, ge=1, le=256)
 
     # Retrieval and context budget.
-    retrieval_mode: RetrievalMode = "dense"
+    retrieval_mode: RetrievalMode = "hybrid"  # selected on the dev split; see docs/evaluation.md
     candidate_k: int = Field(default=20, ge=1, le=100)
-    context_max_chunks: int = Field(default=6, ge=1, le=20)
+    context_max_chunks: int = Field(default=10, ge=1, le=20)
     evidence_token_budget: int = Field(default=3000, ge=200, le=20000)
     rrf_k: int = Field(default=60, ge=1, le=1000)
 

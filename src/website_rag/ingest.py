@@ -98,21 +98,21 @@ def ingest_site(
                     skip_reasons[_reason_key(e.reason)] = skip_reasons.get(_reason_key(e.reason), 0) + 1
             span.set(accepted=len(result.pages), log_entries=len(result.log),
                      stopped_reason=result.stopped_reason, skip_reasons=skip_reasons)
-        if len(result.pages) < min_pages:
-            js = skip_reasons.get("likely_javascript_rendered", 0)
-            raise RagError(
-                ErrorCode.LOW_CONTENT,
-                f"No usable content pages were extracted from {site.seed_url} "
-                f"({len(result.log)} URLs examined).",
-                hint=(
-                    "The site appears to render content with JavaScript, which this static-HTML "
-                    "crawler does not execute." if js else
-                    "Check that the URL points to a public HTML section with text content; "
-                    "see `rag trace <run-id>` for per-URL reasons."
-                ),
-                stage="crawl",
-                details={"skip_reasons": skip_reasons},
-            )
+            if len(result.pages) < min_pages:
+                js = skip_reasons.get("likely_javascript_rendered", 0)
+                raise RagError(
+                    ErrorCode.LOW_CONTENT,
+                    f"No usable content pages were extracted from {site.seed_url} "
+                    f"({len(result.log)} URLs examined).",
+                    hint=(
+                        "The site appears to render content with JavaScript, which this static-HTML "
+                        "crawler does not execute." if js else
+                        "Check that the URL points to a public HTML section with text content; "
+                        "see `rag trace <run-id>` for per-URL reasons."
+                    ),
+                    stage="crawl",
+                    details={"skip_reasons": skip_reasons},
+                )
         progress("stage", {"name": "chunk"})
         with tracer.span("chunk", target=settings.chunk_target_tokens, overlap=settings.chunk_overlap_tokens) as span:
             chunks = chunk_pages(result.pages, settings.chunk_target_tokens, settings.chunk_overlap_tokens)

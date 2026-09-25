@@ -358,3 +358,29 @@ def test_invalid_config_fails_clearly(tmp_path):
         Settings(_env_file=None, data_dir=tmp_path, chunk_target_tokens=100, chunk_overlap_tokens=150)
     with pytest.raises(ValueError):
         Settings(_env_file=None, data_dir=tmp_path, provider="anthropic")
+
+
+# ---------------------------------------------------------------- evaluation metrics
+
+
+def test_retrieval_metrics_alternatives_and_multi_page():
+    from datetime import UTC, datetime
+
+    from website_rag.evaluate import retrieval_metrics
+    from website_rag.schemas import ChunkRecord, RetrievedChunk
+
+    def rc(url, text, rank):
+        c = ChunkRecord(chunk_id=f"c{rank}", site_id="s", corpus_id="c", page_id="p", source_url=url, title="t",
+                        heading_path=["h"], anchor=None, ordinal=rank, text=text, token_count=5, content_hash="x",
+                        fetched_at=datetime.now(UTC))
+        return RetrievedChunk(chunk=c, retriever="dense", rank=rank, score=1.0)
+
+    case = {"evidence_groups": [[{"url": "u/a", "quote": "alpha beta gamma"}, {"url": "u/faq", "quote": "faq answer here"}],
+                                [{"url": "u/b", "quote": "delta epsilon zeta"}]],
+            "required_pages": ["u/a", "u/b"]}
+    retrieved = [rc("u/x", "noise text", 1), rc("u/faq", "The FAQ ANSWER here!", 2), rc("u/b", "delta  epsilon zeta.", 3)]
+    m = retrieval_metrics(case, retrieved, retrieved[:2])
+    assert m["group_ranks"] == [2, 3] and m["hits@3"] == 2 and m["first_hit_rank"] == 2
+    assert m["context_group_hits"] == 1 and not m["multi_page_complete"]
+    m2 = retrieval_metrics(case, retrieved, retrieved)
+    assert m2["multi_page_complete"] and m2["evidence_pages_in_context"] == 2
