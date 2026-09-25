@@ -417,12 +417,12 @@ def chat(
                 mode = _validate_choice(arg.strip(), ("dense", "bm25", "hybrid", "hybrid_rerank"), "mode") or mode
             elif cmd == "/sources":
                 if last_run:
-                    sources(last_run)
+                    sources(last_run, as_json=False)
                 else:
                     console.print(Text("No answer yet on this website.", style="dim"))
             elif cmd == "/trace":
                 if last_run:
-                    trace(last_run)
+                    trace(last_run, as_json=False)
                 else:
                     console.print(Text("No answer yet on this website.", style="dim"))
             elif cmd == "/help":

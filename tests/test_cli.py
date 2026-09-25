@@ -84,3 +84,16 @@ def test_doctor_json_reports_key_presence_only(run, capsys, monkeypatch):
     assert "should-never-be-printed" not in out
     checks = {c["check"]: c for c in json.loads(out)["checks"]}
     assert checks["openai key"]["status"] == "ok" and checks["groq key"]["status"] == "warn"
+
+
+def test_chat_session_switching_and_sources_render_as_text(run, capsys, monkeypatch):
+    import io
+
+    monkeypatch.setattr(sys, "stdin", io.StringIO("9\n2\nWhat is a spider?\n/sources\n/bogus\n/quit\n"))
+    assert run("--no-color", "chat") == 0
+    out = capsys.readouterr().out
+    assert "Website '9' is not registered" in out  # invalid number: explicit message
+    assert "Website 2 is not ingested yet" in out and "Staying on website 1" in out  # never silently switch
+    assert "has no completed index" in out  # question on unready site: explicit error
+    assert "Run r-" in out and '"run_id"' not in out  # /sources renders text, not JSON
+    assert "Unknown command /bogus" in out
