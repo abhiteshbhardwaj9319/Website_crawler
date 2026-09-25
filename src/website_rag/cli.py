@@ -645,12 +645,12 @@ def main() -> None:
         code = getattr(exc, "exit_code", getattr(exc, "code", 0))
         sys.exit(code or 0)
     except Exception as exc:  # click usage errors and unexpected failures
-        import click
-
-        if isinstance(exc, click.exceptions.ClickException):
-            exc.show()
-            sys.exit(exc.exit_code)
-        if isinstance(exc, click.exceptions.Abort):
+        # Typer vendors its own Click, so match usage errors by class hierarchy name.
+        names = {cls.__name__ for cls in type(exc).__mro__}
+        if "ClickException" in names:
+            exc.show()  # type: ignore[attr-defined]
+            sys.exit(getattr(exc, "exit_code", 2))
+        if "Abort" in names:
             sys.exit(130)
         from .tracing import redact
 
