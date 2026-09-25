@@ -1,6 +1,6 @@
 # Project working agreement
 
-Build a website-grounded RAG assessment within a practical 1-2 day scope. The project is currently in planning; do not start application implementation until the user requests the next implementation phase.
+Build a website-grounded RAG assessment within a practical 1-2 day scope. The user has authorized complete implementation, milestone by milestone. Read `docs/implementation-scope.md` for the latest requirements: numbered isolated websites, polished CLI, OpenAI/Groq support, retrieval comparison, and local tracing. Application code has not yet been written at this handoff.
 
 ## Resume work
 
@@ -18,6 +18,8 @@ Build a website-grounded RAG assessment within a practical 1-2 day scope. The pr
 - Compare retrieval changes against a frozen baseline. Record corpus, model, prompt, and configuration versions. Do not fabricate evaluation or cost results.
 - Test consequential behavior and failure cases. Distinguish infrastructure errors from insufficient evidence.
 - Keep provider keys out of code, prompts, logs, tests, and documentation. `.env.example` contains placeholders only.
+- Enforce the selected site/corpus in dense and lexical retrieval, context, citations, traces, and accounting. Test cross-site leakage; a prompt alone is not isolation.
+- Distinguish billing exhaustion, authentication, rate limits, and transient provider failures. Make any provider fallback visible and bounded; never silently change embedding models.
 
 ## Checkpoints
 

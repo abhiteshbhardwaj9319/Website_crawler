@@ -1,6 +1,6 @@
 # Proposed architecture
 
-**Status: PROPOSED, 2026-09-26. No application components exist yet.** Website, provider, model IDs, and dependency versions are pending. All module paths below are intended locations.
+**Status: PROPOSED, 2026-09-26. Implementation is authorized; no application components exist yet.** Read [the scope amendment](implementation-scope.md) first: it adds the site registry and selected-corpus isolation, OpenAI/Groq support, retrieval experiments, and tracing. The original flow below represents one selected website; apply it independently per corpus. Exact model IDs and dependency versions remain to be verified. All module paths below are intended locations.
 
 ## Overall flow
 
@@ -138,7 +138,7 @@ A valid chunk reference only proves the passage was retrieved. It does not prove
 
 ## Known limits and validation plan
 
-Single-process local storage; static HTML first; partial website coverage; snapshot drift; probabilistic model behavior; imperfect parsing of complex layouts. A 15-question evaluation can reveal failures but cannot establish production accuracy. Prompt rules and quotation checks reduce some failure modes but cannot guarantee zero hallucination.
+Single-process local storage; static HTML first; partial coverage per website; snapshot drift; probabilistic model behavior; imperfect parsing of complex layouts. A 15-question evaluation can reveal failures but cannot establish production accuracy. Prompt rules and quotation checks reduce some failure modes but cannot guarantee zero hallucination. The scope amendment adds registry.py, provider/error handling, and local tracing responsibilities to the module map; finalize those boundaries during M1.
 
 M2 verifies page quality and crawl boundaries. M3 verifies index reuse and retrieval evidence. M4 verifies graph behavior and provenance. M5 compares retrieval/answer quality on frozen labels. M6 verifies cost arithmetic. M7 checks a fresh setup and reconciles this document with actual code.
 

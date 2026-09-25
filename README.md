@@ -1,12 +1,12 @@
 # Website-Grounded RAG Agent
 
-**Status: planning only. No application code, runnable commands, evaluation results, or measured costs exist yet.**
+**Status: implementation authorized; handoff prepared. No application code, runnable commands, evaluation results, or measured costs exist yet.**
 
-This assessment will build a small system that crawls one public website, indexes at least 20 useful pages, and answers questions using only retrieved website content with supporting source URLs. It will use LangChain and/or LangGraph and report ingestion/query token usage and estimated costs.
+This assessment will build a small system that crawls public websites, indexes at least 20 useful pages for the primary demo site, and answers questions using only the selected website's retrieved content with supporting source URLs. It will use LangChain and/or LangGraph and report ingestion/query token usage and estimated costs.
 
 The proposed design is documented in [the architecture](docs/architecture.md), with a standalone [overview diagram](docs/diagrams/architecture-overview.svg). These describe intended behavior, not implemented features.
 
-The initial recommendation is a Python CLI, a bounded LangGraph query workflow, and persistent local Qdrant storage. Dense retrieval establishes the baseline; a lexical/hybrid comparison determines whether additional retrieval complexity earns its place. Website, model provider, exact dependencies, and spending limit are not yet confirmed.
+The accepted direction is a polished Python CLI with stable numbered website selection, default site 1, and the ability to ingest a new public URL. The proposed technical defaults are a bounded LangGraph query workflow, persistent local Qdrant, and local embeddings with OpenAI/Groq generation. Dense and hybrid retrieval will be compared; a reranker will be evaluated if practical. Structured local traces will explain sources, costs, and errors. See the [latest implementation scope](docs/implementation-scope.md) for the requirements and rationale. Exact models, dependency versions, and site viability still require implementation checks.
 
 ## Planned submission contents
 
