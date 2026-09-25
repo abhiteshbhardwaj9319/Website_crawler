@@ -1,0 +1,46 @@
+[project]
+name = "website-rag"
+version = "0.1.0"
+description = "Website-grounded RAG agent: crawl isolated website corpora and answer only from cited evidence."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "beautifulsoup4==4.15.0",
+    "fastembed==0.8.1",
+    "httpx==0.28.1",
+    "langchain-core==1.6.5",
+    "langchain-groq==1.1.3",
+    "langchain-openai==1.6.6",
+    "langgraph==1.2.12",
+    "lxml==6.1.3",
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "qdrant-client==1.19.1",
+    "rank-bm25==0.2.2",
+    "rich==15.0.0",
+    "tiktoken==0.14.0",
+    "typer==0.27.2",
+]
+
+[project.scripts]
+rag = "website_rag.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "respx==0.23.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/website_rag"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "live: calls real network services or paid/free-tier provider APIs; opt in with RAG_LIVE_TESTS=1",
+]
+addopts = "-q"

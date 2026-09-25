@@ -1,0 +1,45 @@
+{
+  "pricing_version": "2026-09-26",
+  "currency": "USD",
+  "unit": "per 1M tokens",
+  "notes": "Standard (non-batch, non-flex) tier. Checked 2026-09-26 against the official pages listed per model. Prices change; recheck before relying on projections.",
+  "models": {
+    "openai:gpt-4.1-mini": {
+      "input": 0.40,
+      "cached_input": 0.10,
+      "output": 1.60,
+      "source": "https://developers.openai.com/api/docs/pricing"
+    },
+    "openai:gpt-4o-mini": {
+      "input": 0.15,
+      "cached_input": 0.075,
+      "output": 0.60,
+      "source": "https://developers.openai.com/api/docs/pricing"
+    },
+    "groq:openai/gpt-oss-120b": {
+      "input": 0.15,
+      "cached_input": null,
+      "output": 0.60,
+      "source": "https://console.groq.com/docs/models",
+      "free_tier_limits": "30 RPM, 1K RPD, 8K TPM, 200K TPD (https://console.groq.com/docs/rate-limits)"
+    },
+    "groq:openai/gpt-oss-20b": {
+      "input": 0.075,
+      "cached_input": null,
+      "output": 0.30,
+      "source": "https://console.groq.com/docs/models"
+    },
+    "local:BAAI/bge-small-en-v1.5": {
+      "input": 0.0,
+      "cached_input": null,
+      "output": 0.0,
+      "source": "Local ONNX model via fastembed; no API charge. Compute, download (~67 MB) and electricity are not priced."
+    },
+    "local:Xenova/ms-marco-MiniLM-L-6-v2": {
+      "input": 0.0,
+      "cached_input": null,
+      "output": 0.0,
+      "source": "Local ONNX cross-encoder via fastembed; no API charge. Download ~80 MB."
+    }
+  }
+}

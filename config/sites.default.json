@@ -1,0 +1,17 @@
+[
+  {
+    "site_id": "scrapy-docs-2-19",
+    "display_name": "Scrapy 2.19 documentation",
+    "seed_url": "https://docs.scrapy.org/en/2.19/",
+    "description": "Primary corpus. Pinned version path; /en/stable/ is disallowed by robots.txt and /en/latest/ drifts.",
+    "crawl": {"max_pages": 45, "max_depth": 3, "delay_s": 0.5, "concurrency": 2},
+    "exclude_patterns": ["/news[.]html$"]
+  },
+  {
+    "site_id": "python-tutorial-3-13",
+    "display_name": "Python 3.13 tutorial",
+    "seed_url": "https://docs.python.org/3.13/tutorial/index.html",
+    "description": "Second, smaller corpus used to demonstrate site isolation.",
+    "crawl": {"max_pages": 25, "max_depth": 2, "delay_s": 0.5, "concurrency": 2}
+  }
+]
