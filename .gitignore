@@ -1,0 +1,47 @@
+# Internal planning, personal reference material, and local backups
+/Planning and Documents - Internal Use/
+/.local-backups/
+
+# Secrets: examples must contain placeholders only
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+service-account*.json
+secrets/
+
+# Python environments and generated artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Crawl snapshots, vector storage, raw traces, and local output
+/data/
+/artifacts/
+/output/
+/tmp/
+*.log
+*.sqlite
+*.sqlite3
+
+# Editor, OS, and recordings
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.mp4
+*.mov
+node_modules/
+
+# Keep reviewed submission evidence in docs/ and eval/ tracked.
