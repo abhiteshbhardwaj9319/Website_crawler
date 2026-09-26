@@ -1,0 +1,213 @@
+{
+  "prompt": "answer_v1:69f07d7df72a",
+  "sites": [
+    {
+      "site": 1,
+      "manifest": {
+        "corpus_id": "scrapy-docs-2-19--20260925T233638-a193f0",
+        "site_id": "scrapy-docs-2-19",
+        "status": "complete",
+        "seed_url": "https://docs.scrapy.org/en/2.19/",
+        "allowed_host": "docs.scrapy.org",
+        "allowed_path_prefix": "/en/2.19/",
+        "collection_name": "corpus_scrapy-docs-2-19--20260925T233638-a193f0",
+        "accepted_pages": 45,
+        "chunk_count": 945,
+        "embedding_model": "BAAI/bge-small-en-v1.5",
+        "embedding_dim": 384,
+        "chunker_version": "chunk-v1",
+        "extractor_version": "extract-v1",
+        "chunk_target_tokens": 320,
+        "chunk_overlap_tokens": 48,
+        "config_fingerprint": "2c1fe47adb49baaa",
+        "started_at": "2026-09-25T23:36:39.196615Z",
+        "completed_at": "2026-09-25T23:37:21.797651Z",
+        "error": null
+      },
+      "chunks_sha256": "8263e7ee4b07a2fdb2a747592f8038985a9f26b0d3f6e97700c834fe0ea9fa73",
+      "input_definition_present": false
+    },
+    {
+      "site": 2,
+      "manifest": {
+        "corpus_id": "python-tutorial-3-13--20260925T224632",
+        "site_id": "python-tutorial-3-13",
+        "status": "complete",
+        "seed_url": "https://docs.python.org/3.13/tutorial/",
+        "allowed_host": "docs.python.org",
+        "allowed_path_prefix": "/3.13/tutorial/",
+        "collection_name": "corpus_python-tutorial-3-13--20260925T224632",
+        "accepted_pages": 17,
+        "chunk_count": 251,
+        "embedding_model": "BAAI/bge-small-en-v1.5",
+        "embedding_dim": 384,
+        "chunker_version": "chunk-v1",
+        "extractor_version": "extract-v1",
+        "chunk_target_tokens": 320,
+        "chunk_overlap_tokens": 48,
+        "config_fingerprint": "2c1fe47adb49baaa",
+        "started_at": "2026-09-25T22:46:32.929028Z",
+        "completed_at": "2026-09-25T22:47:34.885127Z",
+        "error": null
+      },
+      "chunks_sha256": "447f9de58a31ba8122a49dddabbf8439c8d8be8ff631cb85e1287a3cfd5f657f",
+      "input_definition_present": false
+    }
+  ],
+  "saved_runs": [
+    {
+      "run_id": "r-b8c282cd238248ee",
+      "status": "answered",
+      "usage": {
+        "attempts": 1,
+        "errors": 0,
+        "input_tokens": 2592,
+        "cached_input_tokens": 0,
+        "output_tokens": 245,
+        "reasoning_tokens": 0,
+        "cost_usd": 0.0014288,
+        "unknown_cost_events": 0,
+        "local_embedding_tokens": 9,
+        "accounting_write_failures": 0
+      },
+      "latency_ms": 8659,
+      "accepted_claims": 2,
+      "rejected_reasons": []
+    },
+    {
+      "run_id": "r-50ca55c1fae84f43",
+      "status": "partially_answered",
+      "usage": {
+        "attempts": 1,
+        "errors": 0,
+        "input_tokens": 3534,
+        "cached_input_tokens": 0,
+        "output_tokens": 726,
+        "reasoning_tokens": 0,
+        "cost_usd": 0.0025752,
+        "unknown_cost_events": 0,
+        "local_embedding_tokens": 3,
+        "accounting_write_failures": 0
+      },
+      "latency_ms": 5593,
+      "accepted_claims": 3,
+      "rejected_reasons": [
+        [
+          "quote not found in chunk 9ac5d6b3f11e36b3fb2bc026"
+        ],
+        [
+          "quote not found in chunk 9b3ba446955a1b955c165749"
+        ]
+      ]
+    }
+  ],
+  "live": [
+    {
+      "site": 1,
+      "question": "Which command creates a new Scrapy project?",
+      "run_id": "r-ebe34280072844b4",
+      "status": "answered",
+      "error": null,
+      "usage": {
+        "attempts": 1,
+        "errors": 0,
+        "input_tokens": 2592,
+        "cached_input_tokens": 0,
+        "output_tokens": 251,
+        "reasoning_tokens": 0,
+        "cost_usd": 0.0014384,
+        "unknown_cost_events": 0,
+        "local_embedding_tokens": 9,
+        "accounting_write_failures": 0
+      },
+      "latency_ms": 8422,
+      "citations": [
+        {
+          "marker": 1,
+          "chunk_id": "b3d39d8b4e60884f6f745227",
+          "url": "https://docs.scrapy.org/en/2.19/topics/commands.html#startproject",
+          "title": "Command line tool",
+          "section": "Command line tool > Available tool commands > startproject"
+        },
+        {
+          "marker": 2,
+          "chunk_id": "ef4e8b123e1bfa92fc334611",
+          "url": "https://docs.scrapy.org/en/2.19/topics/commands.html#creating-projects",
+          "title": "Command line tool",
+          "section": "Command line tool > Using the scrapy tool > Creating projects"
+        }
+      ],
+      "rejected_reasons": []
+    },
+    {
+      "site": 2,
+      "question": "what is python",
+      "run_id": "r-cd2fb667857f43fc",
+      "status": "partially_answered",
+      "error": null,
+      "usage": {
+        "attempts": 1,
+        "errors": 0,
+        "input_tokens": 3534,
+        "cached_input_tokens": 0,
+        "output_tokens": 632,
+        "reasoning_tokens": 0,
+        "cost_usd": 0.0024248000000000004,
+        "unknown_cost_events": 0,
+        "local_embedding_tokens": 3,
+        "accounting_write_failures": 0
+      },
+      "latency_ms": 6204,
+      "citations": [
+        {
+          "marker": 1,
+          "chunk_id": "4a750a30344c3ca484911c38",
+          "url": "https://docs.python.org/3.13/tutorial/#the-python-tutorial",
+          "title": "The Python Tutorial",
+          "section": "The Python Tutorial"
+        },
+        {
+          "marker": 2,
+          "chunk_id": "4a750a30344c3ca484911c38",
+          "url": "https://docs.python.org/3.13/tutorial/#the-python-tutorial",
+          "title": "The Python Tutorial",
+          "section": "The Python Tutorial"
+        },
+        {
+          "marker": 3,
+          "chunk_id": "9ac5d6b3f11e36b3fb2bc026",
+          "url": "https://docs.python.org/3.13/tutorial/appetite.html#whetting-your-appetite",
+          "title": "1. Whetting Your Appetite",
+          "section": "1. Whetting Your Appetite"
+        }
+      ],
+      "rejected_reasons": [
+        [
+          "quote not found in chunk 9b3ba446955a1b955c165749"
+        ]
+      ]
+    },
+    {
+      "site": 2,
+      "question": "what is python command to get input",
+      "run_id": "r-0132fa3a6d9a483e",
+      "status": "insufficient_evidence",
+      "error": null,
+      "usage": {
+        "attempts": 1,
+        "errors": 0,
+        "input_tokens": 3385,
+        "cached_input_tokens": 0,
+        "output_tokens": 40,
+        "reasoning_tokens": 0,
+        "cost_usd": 0.001418,
+        "unknown_cost_events": 0,
+        "local_embedding_tokens": 7,
+        "accounting_write_failures": 0
+      },
+      "latency_ms": 1645,
+      "citations": [],
+      "rejected_reasons": []
+    }
+  ]
+}

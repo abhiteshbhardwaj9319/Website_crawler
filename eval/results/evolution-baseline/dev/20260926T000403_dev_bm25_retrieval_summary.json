@@ -1,0 +1,29 @@
+{
+  "split": "dev",
+  "mode": "bm25",
+  "provider_mode": null,
+  "cases": 10,
+  "answerable_cases": 8,
+  "evidence_groups": 10,
+  "recall@3": "6/10",
+  "recall@6": "8/10",
+  "recall@10": "10/10",
+  "recall@20": "10/10",
+  "context_recall": "10/10",
+  "multi_page_labeled_pages_in_context": "3/4",
+  "multi_page_complete": "2/2",
+  "mrr@20": 0.622,
+  "retrieval_ms_mean": 12.2,
+  "questions_sha256": "5dbfde17798d1ef0b55802b282e2be502b6bef1d4ed2acb21583f2d56d5795bb",
+  "settings": {
+    "candidate_k": 20,
+    "context_max_chunks": 10,
+    "evidence_token_budget": 3000,
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "rrf_k": 60,
+    "openai_model": "gpt-4.1-mini-2025-04-14",
+    "groq_model": "openai/gpt-oss-120b"
+  },
+  "results_file": "20260926T000403_dev_bm25_retrieval.jsonl"
+}
