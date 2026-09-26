@@ -378,7 +378,7 @@ def test_retrieval_metrics_alternatives_and_multi_page():
     case = {"evidence_groups": [[{"url": "u/a", "quote": "alpha beta gamma"}, {"url": "u/faq", "quote": "faq answer here"}],
                                 [{"url": "u/b", "quote": "delta epsilon zeta"}]],
             "required_pages": ["u/a", "u/b"]}
-    retrieved = [rc("u/x", "noise text", 1), rc("u/faq", "The FAQ ANSWER here!", 2), rc("u/b", "delta  epsilon zeta.", 3)]
+    retrieved = [rc("u/x", "noise text", 1), rc("u/faq", "The faq answer here!", 2), rc("u/b", "delta  epsilon zeta.", 3)]
     m = retrieval_metrics(case, retrieved, retrieved[:2])
     assert m["group_ranks"] == [2, 3] and m["hits@3"] == 2 and m["first_hit_rank"] == 2
     assert m["context_group_hits"] == 1 and not m["multi_page_complete"]

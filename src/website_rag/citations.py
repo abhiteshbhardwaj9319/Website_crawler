@@ -1,59 +1,34 @@
-"""Deterministic validation of model-produced claims against the supplied context.
-
-Checks (structural, not semantic):
-- every cited chunk_id must be one of the chunks actually sent to the model for this run;
-- every quote must occur in that chunk's text after normalization (Unicode NFKC,
-  typographic quotes/dashes folded, markdown code fences/backticks removed, whitespace
-  collapsed, case-folded). A quote may use "..." to join excerpts that occur in order;
-- quotes shorter than MIN_QUOTE_CHARS after normalization are rejected as non-evidence.
-A claim with any invalid evidence is rejected as a whole. Source URLs, titles and sections
-are rendered from indexed metadata, never from model output.
-
-A valid ID and quote prove the passage was supplied and quoted, not that it entails the
-claim; semantic support is judged in evaluation.
+"""Structural source linkage, not semantic entailment. V2 selects exact local passages;
+legacy quotes require a case-sensitive contiguous match with whitespace normalization.
 """
 
 from __future__ import annotations
 
 import re
-import unicodedata
-
-from .schemas import AnswerDraft, ChunkRecord, RejectedClaim, ValidatedCitation, ValidatedClaim
+from .evidence import evidence_spans
+from .schemas import AnswerDraft, AnswerSelection, ChunkRecord, RejectedClaim, ValidatedCitation, ValidatedClaim
 
 MIN_QUOTE_CHARS = 8
-_FOLD = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"', "–": "-",
-                       "—": "-", " ": " ", "…": "..."})
 
 
 def normalize(text: str) -> str:
-    text = unicodedata.normalize("NFKC", text).translate(_FOLD)
-    text = text.replace("```", " ").replace("`", "")
-    text = re.sub(r"\s+", " ", text)
-    return text.strip().casefold()
+    """Whitespace only: never fold code case, punctuation, Unicode, or negation."""
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def quote_in_text(quote: str, text: str) -> bool:
-    haystack = normalize(text)
-    parts = [p.strip(" .,;:") for p in normalize(quote).split("...")]
-    parts = [p for p in parts if p]
-    if not parts or sum(len(p) for p in parts) < MIN_QUOTE_CHARS:
-        return False
-    pos = 0
-    for part in parts:
-        found = haystack.find(part, pos)
-        if found < 0:
-            return False
-        pos = found + len(part)
-    return True
+    needle = normalize(quote)
+    return len(needle) >= MIN_QUOTE_CHARS and needle in normalize(text)
 
 
 def validate_claims(
-    draft: AnswerDraft, context: dict[str, ChunkRecord]
+    draft: AnswerDraft | AnswerSelection, context: dict[str, ChunkRecord]
 ) -> tuple[list[ValidatedClaim], list[ValidatedCitation], list[RejectedClaim]]:
     claims: list[ValidatedClaim] = []
     citations: list[ValidatedCitation] = []
     rejected: list[RejectedClaim] = []
     marker_for: dict[tuple[str, str], int] = {}
+    span_maps = {cid: {s.span_id: s for s in evidence_spans(c)} for cid, c in context.items()}
 
     for claim in draft.claims:
         reasons: list[str] = []
@@ -64,6 +39,12 @@ def validate_claims(
             chunk = context.get(ev.chunk_id)
             if chunk is None:
                 reasons.append(f"chunk id '{ev.chunk_id[:40]}' was not in the supplied evidence")
+            elif isinstance(draft, AnswerSelection):
+                span = span_maps[ev.chunk_id].get(ev.span_id)
+                if span is None:
+                    reasons.append(f"passage id '{ev.span_id[:40]}' was not supplied for chunk {ev.chunk_id}")
+                else:
+                    pending.append((chunk, span.text))
             elif not quote_in_text(ev.quote, chunk.text):
                 reasons.append(f"quote not found in chunk {ev.chunk_id}")
             else:

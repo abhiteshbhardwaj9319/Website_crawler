@@ -2,7 +2,7 @@
 
 A command-line system that crawls public documentation websites, builds an isolated search index per website, and answers questions **only** from the selected website's indexed pages, with source URLs, section headings, and verified quotes. It says explicitly when the indexed pages do not contain the answer.
 
-**Status (2026-09-26):** implemented and covered by 70 offline tests; crawling, indexing, retrieval evaluation, and site isolation verified on real websites. **Not yet verified against live OpenAI/Groq endpoints** (no keys were available where this was built): answer-level evaluation results and measured per-query output tokens are pending. See [evaluation](docs/evaluation.md) and [cost analysis](docs/cost-analysis.md).
+**Status (2026-09-26):** E1 baseline and E2 grounding changes verified: 88 offline tests pass (3 live tests skipped). Three new live OpenAI baseline calls were recorded against the original corpus; updated prompt/provider evaluation is pending E6. See [evolution evidence](docs/evolution.md).
 
 ![Architecture](docs/diagrams/architecture-overview.svg)
 
@@ -12,7 +12,7 @@ Requires Python 3.11-3.13 and [uv](https://docs.astral.sh/uv/). Tested on Window
 
 ```bash
 uv sync                      # pinned, locked dependencies
-cp .env.example .env         # add OPENAI_API_KEY and/or GROQ_API_KEY (never commit .env)
+# Create .env from .env.example only if .env does not already exist; add your provider keys.
 uv run rag doctor            # versions, key presence (never values), site readiness
 uv run rag doctor --check-providers   # optional: verifies keys with a free model-listing call
 uv run rag ingest --site 1   # Scrapy 2.19 docs: 45 pages, ~3 min on first run (downloads a 67 MB embedding model)

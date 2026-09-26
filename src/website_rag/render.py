@@ -74,61 +74,51 @@ def site_banner(site: SiteRecord) -> Text:
     return t
 
 
-def answer_panel(result: AnswerResult, show_retrieval: bool = False) -> Group:
+def claim_text(text: str) -> Text:
+    """Render only code delimiters; never interpret arbitrary markup or links."""
+    out = Text()
+    for i, part in enumerate(re.split(r"(```[\s\S]*?```|`[^`\n]+`)", clean(text))):
+        if part.startswith("```") and part.endswith("```"):
+            out.append(part[3:-3].strip("\n"), style="cyan")
+        elif part.startswith("`") and part.endswith("`"):
+            out.append(part[1:-1], style="bold cyan")
+        else:
+            out.append(part)
+    return out
+
+
+def answer_panel(result: AnswerResult, show_retrieval: bool = False, explain: bool = False) -> Group:
     label, style = STATUS_STYLE[result.status]
-    parts: list = []
-    body = Text()
-    if result.answer:
-        body.append(clean(result.answer))
-    if result.status == "error" and result.error:
-        body.append(clean(result.error.get("message", "")), style="red")
-        if result.error.get("hint"):
-            body.append("\nNext step: ", style="bold")
-            body.append(clean(result.error["hint"]))
-    if result.premise_issue:
-        body.append("\n\nPremise check: ", style="bold yellow")
-        body.append(clean(result.premise_issue))
-    if result.missing_information and result.status != "answered":
-        body.append("\n\nNot covered by the indexed pages: ", style="bold")
-        body.append(clean(result.missing_information))
-    parts.append(Panel(body if body.plain else Text("(no answer text)", style="dim"),
-                       title=Text(label, style=style), title_align="left", border_style=style.split()[-1]))
-
-    if result.claims:
-        claims = Table.grid(padding=(0, 1))
-        claims.add_column(style="dim", no_wrap=True)
-        claims.add_column()
+    parts: list = [Text(label, style=style)]
+    # Reconstruct even old saved runs from their accepted claims. Never replay unchecked prose.
+    sources: dict[str, int] = {}
+    marker_map: dict[int, int] = {}
+    for c in result.citations:
+        sources.setdefault(c.url, len(sources) + 1)
+        marker_map[c.marker] = sources[c.url]
+    if result.status in ("answered", "partially_answered"):
         for claim in result.claims:
-            markers = "".join(f"[{m}]" for m in claim.citations)
-            claims.add_row(markers, safe(claim.text))
-        parts.append(Panel(claims, title="Verified claims", title_align="left", border_style="dim"))
-
-    if result.citations:
-        src = Table(show_header=True, header_style="bold", expand=False, box=None, padding=(0, 1))
-        src.add_column("#", style="cyan", justify="right")
-        src.add_column("Source")
+            line = claim_text(claim.text)
+            markers = sorted({marker_map[m] for m in claim.citations if m in marker_map})
+            line.append(" " + "".join(f"[{m}]" for m in markers), style="cyan")
+            parts.extend([line, Text("")])
+    elif result.status == "insufficient_evidence":
+        parts.append(safe(f"The indexed pages for {result.site_name} do not contain enough information to answer this question."))
+    elif result.error:
+        parts.append(safe(result.error.get("message", ""), "red"))
+        parts.append(safe("Next step: " + result.error.get("hint", "")))
+    if result.rejected_claims and result.status != "error":
+        parts.append(Text(f"{len(result.rejected_claims)} statement(s) withheld: citation checks failed.", style="yellow"))
+    elif result.status == "partially_answered":
+        parts.append(Text("The retrieved evidence supports only part of the requested answer.", style="yellow"))
+    for url, marker in sources.items():
+        parts.append(safe(f"[{marker}] {url}", "dim"))
+    if explain:
         for c in result.citations:
-            cell = Text()
-            cell.append(clean(c.title), style="bold")
-            cell.append("  ")
-            cell.append(clean(c.section), style="dim")
-            cell.append("\n")
-            cell.append(clean(c.url), style="underline blue")
-            cell.append("\n“", style="dim")
-            quote = clean(c.quote)
-            cell.append(quote if len(quote) <= 220 else quote[:217] + "...", style="italic")
-            cell.append("”", style="dim")
-            src.add_row(str(c.marker), cell)
-        parts.append(Panel(src, title="Sources", title_align="left", border_style="cyan"))
-
-    if result.rejected_claims:
-        rej = Text()
+            parts.append(safe(f"\nEvidence [{marker_map[c.marker]}] / original marker {c.marker}: {c.section}\n"
+                              f"{c.chunk_id}\n{c.quote}"))
         for r in result.rejected_claims:
-            rej.append("- ", style="red")
-            rej.append(clean(r.text))
-            rej.append(f"  ({'; '.join(r.reasons)})\n", style="dim")
-        parts.append(Panel(rej, title="Withheld statements (failed citation checks)", title_align="left", border_style="red"))
-
+            parts.append(safe(f"\nUNTRUSTED REJECTED CANDIDATE: {r.text}\nReasons: {'; '.join(r.reasons)}", "red"))
     if show_retrieval and result.retrieved:
         parts.append(retrieval_table(result))
     parts.append(meta_line(result))

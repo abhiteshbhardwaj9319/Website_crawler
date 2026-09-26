@@ -1,6 +1,6 @@
 """Grounded answer generation through LangChain chat-model integrations.
 
-One structured-output call per provider attempt: `with_structured_output(AnswerDraft,
+One structured-output call per provider attempt: `with_structured_output(AnswerSelection,
 method="json_schema", strict=True, include_raw=True)`. Both configured models support
 strict JSON-schema output (OpenAI gpt-4.1-mini; Groq openai/gpt-oss-120b). `include_raw`
 keeps the raw message so provider-reported token usage is captured even when parsing fails.
@@ -17,9 +17,11 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import ValidationError
 
 from .config import ProviderName, Settings
-from .schemas import AnswerDraft, ChunkRecord, SiteRecord
+from .schemas import AnswerDraft, AnswerSelection, ChunkRecord, SiteRecord
+from .evidence import evidence_spans
+from html import escape
 
-PROMPT_VERSION = "answer_v1"
+PROMPT_VERSION = "answer_v2"
 PROMPT_PATH = Path(__file__).parent / "prompts" / f"{PROMPT_VERSION}.md"
 
 
@@ -32,13 +34,18 @@ def prompt_fingerprint() -> str:
 
 
 def _escape(text: str) -> str:
-    return text.replace("</chunk", "</ chunk").replace("<chunk", "< chunk")
+    return escape(text, quote=True)
+
+
+def format_spans(chunk: ChunkRecord) -> str:
+    return "\n".join(f'<passage id="{s.span_id}" start="{s.start}" end="{s.end}">{_escape(s.text)}</passage>'
+                     for s in evidence_spans(chunk))
 
 
 def build_messages(question: str, site: SiteRecord, context: list[ChunkRecord]) -> list:
     evidence = "\n".join(
         f'<chunk id="{c.chunk_id}" page_title="{_escape(c.title)}" section="{_escape(c.section_label)}">\n'
-        f"{_escape(c.text)}\n</chunk>"
+        f"{format_spans(c)}\n</chunk>"
         for c in context
     )
     user = (
@@ -58,7 +65,7 @@ class MalformedResponse(Exception):
 
 @dataclass
 class GenerationOutput:
-    draft: AnswerDraft
+    draft: AnswerDraft | AnswerSelection
     usage: dict
     model: str
     response_id: str | None
@@ -96,7 +103,7 @@ def extract_usage(raw) -> dict:  # noqa: ANN001
 
 
 def generate_once(model: BaseChatModel, messages: list) -> GenerationOutput:
-    structured = model.with_structured_output(AnswerDraft, method="json_schema", strict=True, include_raw=True)
+    structured = model.with_structured_output(AnswerSelection, method="json_schema", strict=True, include_raw=True)
     try:
         out = structured.invoke(messages)
     except (ValidationError, ValueError) as exc:

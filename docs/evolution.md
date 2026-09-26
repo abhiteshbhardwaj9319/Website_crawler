@@ -16,3 +16,9 @@ Frozen [fingerprints and bounded live runs](../eval/results/evolution-baseline/f
 These were three explicit OpenAI requests, total $0.0052812, under a 3-request/$0.03 stopping cap. The Python corpus has no `input` anchor and excludes `/3.13/library/`; this is a coverage gap before claiming a ranking failure. Safe CLI snapshots at 80/100/140 columns are stored locally under ignored `artifacts/evolution/`.
 
 Confirmed defects: unchecked `draft.answer`/premise prose can bypass claim checks; normal output prints rejected candidates; quote normalization folds code case and accepts ellipsis that can omit negation; crawl batch processing can silently discard fetched results at the accepted-page cap. Coverage expansion, new holdout evaluation, and presentation acceptance remain separate milestones.
+
+## E2 grounding boundary
+
+88 offline tests pass, 3 live tests skipped. Regression cases cover valid claims plus unsupported answer/premise prose, partial rejection, invented IDs/passages, altered quotes, cross-site citations, and terminal widths 80/100/140. Default output contains accepted claims once and deduplicates sources; `--explain` exposes clearly labeled rejected candidates.
+
+`answer_v2` uses `AnswerSelection` (status, claims, chunk/passsage IDs); exact passages are generated locally. No index migration or paid repair call is needed. Existing `answer_v1` records and their original prompt remain available; new output does not display their unchecked prose. Legacy quote validation now preserves case and treats ellipses literally. This establishes structural linkage, not semantic truth. Live v2 quality/cost measurement follows after coverage work.

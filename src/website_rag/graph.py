@@ -295,20 +295,26 @@ def build_graph(deps: QueryDeps):  # noqa: ANN201
         site = state["site"]
         result.provider, result.model = state.get("provider"), state.get("model")
         result.claims, result.citations, result.rejected_claims = claims, citations, rejected
-        result.missing_information = draft.missing_information
-        result.premise_issue = draft.premise_issue
+        # Model-written auxiliary prose is not evidence and must never reach normal output.
+        result.missing_information = ""
+        result.premise_issue = ""
+        supported_answer = "\n\n".join(
+            c.text + " " + "".join(f"[{m}]" for m in c.citations) for c in claims
+        )
         if draft.status == "insufficient_evidence":
             result.status = "insufficient_evidence"
             result.answer = insufficient_message(site)
             result.claims, result.citations = [], []
         elif claims and not rejected:
             result.status = draft.status
-            result.answer = draft.answer
+            result.answer = supported_answer
+            if draft.status == "partially_answered":
+                result.missing_information = "The retrieved evidence supports only part of the requested answer."
         elif claims and rejected:
             # Some claims failed validation: withhold the free-text answer, show only verified claims.
             result.status = "partially_answered"
-            result.answer = ""
-            result.missing_information = (draft.missing_information + " " if draft.missing_information else "") + (
+            result.answer = supported_answer
+            result.missing_information = (
                 f"{len(rejected)} generated statement(s) were withheld because their citations failed validation.")
         else:
             err = RagError(

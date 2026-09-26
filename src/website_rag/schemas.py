@@ -202,6 +202,23 @@ class AnswerDraft(BaseModel):
     )
 
 
+class EvidenceSelection(BaseModel):
+    chunk_id: str = Field(description="Exact supplied chunk ID.")
+    span_id: str = Field(description="Exact supplied passage ID from that chunk.")
+
+
+class SelectedClaim(BaseModel):
+    text: str = Field(description="One concise factual statement supported by the selected passages.")
+    evidence: list[EvidenceSelection]
+
+
+class AnswerSelection(BaseModel):
+    """V2 provider contract. No separate unchecked answer or premise prose."""
+
+    status: Literal["answered", "partially_answered", "insufficient_evidence"]
+    claims: list[SelectedClaim]
+
+
 class ValidatedCitation(BaseModel):
     marker: int
     chunk_id: str

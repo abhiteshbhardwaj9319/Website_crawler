@@ -314,6 +314,7 @@ def ask(
     provider: Optional[str] = typer.Option(None, "--provider", "-p", help="openai | groq | auto"),
     mode: Optional[str] = typer.Option(None, "--mode", "-m", help="dense | bm25 | hybrid | hybrid_rerank"),
     show_retrieval: bool = typer.Option(False, "--show-retrieval", help="Show ranked retrieved chunks."),
+    explain: bool = typer.Option(False, "--explain", help="Show exact evidence and clearly marked rejected candidates."),
     as_json: bool = typer.Option(False, "--json"),
 ) -> None:
     """Answer one question from the selected website's indexed evidence."""
@@ -331,7 +332,7 @@ def ask(
     if as_json:
         _emit_json(json.loads(result.model_dump_json()))
     else:
-        console.print(render.answer_panel(result, show_retrieval=show_retrieval))
+        console.print(render.answer_panel(result, show_retrieval=show_retrieval, explain=explain))
     if result.status == "error":
         raise typer.Exit(2)
 

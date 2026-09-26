@@ -18,8 +18,8 @@ from website_rag.generate import MalformedResponse, build_chat_model, generate_o
 from website_rag.providers import classify
 from website_rag.schemas import SiteRecord
 
-DRAFT = {"status": "answered", "answer": "Use ITEM_PIPELINES.", "missing_information": "", "premise_issue": "",
-         "claims": [{"text": "Enable via ITEM_PIPELINES.", "evidence": [{"chunk_id": "abc", "quote": "ITEM_PIPELINES setting"}]}]}
+DRAFT = {"status": "answered",
+         "claims": [{"text": "Enable via ITEM_PIPELINES.", "evidence": [{"chunk_id": "abc", "span_id": "s-123"}]}]}
 
 
 class FakeServer:

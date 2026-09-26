@@ -194,7 +194,7 @@ def test_supported_answer_renders_metadata_urls_and_accounts_usage(env):
 
     def gen(provider, messages):
         return output(draft("answered", "Blue.", [("WIDGET_COLOR defaults to blue.",
-                                                    [(color.chunk_id, "selects the paint used for widgets;  DEFAULT is blue")])]))
+                                                    [(color.chunk_id, "selects the paint used for widgets;  default is blue")])]))
 
     d = deps(settings, reg, gen)
     r = answer_question(d, "What color are widgets by default?", 1, mode="hybrid", provider_mode="auto")
@@ -223,7 +223,7 @@ def test_partially_invalid_claims_withhold_free_text(env):
         ]))
 
     r = answer_question(deps(settings, reg, gen), "widget color", 1, mode="dense", provider_mode="auto")
-    assert r.status == "partially_answered" and r.answer == ""
+    assert r.status == "partially_answered" and "Default is blue." in r.answer and "waterproof" not in r.answer
     assert [c.text for c in r.claims] == ["Default is blue."] and len(r.rejected_claims) == 1
 
 
