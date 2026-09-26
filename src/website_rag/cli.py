@@ -42,9 +42,11 @@ CTX = Ctx()
 def _global(
     no_color: bool = typer.Option(False, "--no-color", help="Disable colors (also honors NO_COLOR)."),
     debug: bool = typer.Option(False, "--debug", help="Record sanitized stack traces in local traces."),
+    ascii_ui: bool = typer.Option(False, '--ascii', help='ASCII table borders; source/code text stays exact.'),
 ) -> None:
     CTX.no_color = no_color or bool(os.environ.get("NO_COLOR"))
     CTX.debug = debug
+    render.ASCII_UI = ascii_ui
 
 
 def _settings() -> Settings:
@@ -113,7 +115,7 @@ def doctor(
         _emit_json({"checks": checks})
         return
     console = _console()
-    table = Table(title="rag doctor", title_justify="left", header_style="bold")
+    table = Table(title="rag doctor", title_justify="left", header_style="bold", box=render.ui_box())
     table.add_column("Check")
     table.add_column("Status")
     table.add_column("Detail")
@@ -515,6 +517,39 @@ def chat(
 # ----------------------------------------------------------------------------- inspection
 
 
+DEMO_CASES = {
+    'project': (1, 'Which command creates a new Scrapy project?'),
+    'input': (2, 'what is python command to get input'),
+    'abstain': (1, 'How much annual profit does Scrapy earn?'),
+    'isolation': (2, 'How do I enable an item pipeline component in Scrapy?'),
+}
+
+
+@app.command()
+def demo(
+    example: str = typer.Argument('project', help='project | input | abstain | isolation'),
+    provider: str = typer.Option('openai', '--provider'),
+    replay: Optional[str] = typer.Option(None, '--replay', help='Explicitly replay a recorded run ID instead of a live call.'),
+    as_json: bool = typer.Option(False, '--json'),
+) -> None:
+    """Run a real demo question or an explicitly labeled saved replay."""
+    if replay:
+        from .graph import load_run
+        result = load_run(_settings(), replay)
+        metadata = {'replay': True, 'recorded_at': result.created_at, 'corpus': result.corpus_id,
+                    'model': result.model, 'run_id': result.run_id}
+        if as_json:
+            _emit_json({**metadata, 'result': result.model_dump(mode='json')})
+        else:
+            _console().print(render.safe(f'RECORDED REPLAY | {result.created_at} | {result.corpus_id} | {result.model} | {result.run_id}', 'yellow'))
+            _console().print(render.answer_panel(result))
+        return
+    if example not in DEMO_CASES:
+        raise RagError(ErrorCode.INVALID_INPUT, f'Unknown example: {example}', hint=', '.join(DEMO_CASES))
+    site, question = DEMO_CASES[example]
+    ask(question, site=str(site), provider=provider, mode=None, show_retrieval=False, explain=False, as_json=as_json)
+
+
 @app.command()
 def sources(run_id: str = typer.Argument(...), as_json: bool = typer.Option(False, "--json")) -> None:
     """Show the evidence used by a saved run: context chunks, ranks, and cited excerpts."""
@@ -531,6 +566,7 @@ def sources(run_id: str = typer.Argument(...), as_json: bool = typer.Option(Fals
     console.print(Text.assemble(("Run ", "dim"), (run_id, "bold"), (f"  website {result.site_number} ", "dim"),
                                 render.safe(result.site_name, "cyan"), (f"  corpus {result.corpus_id}", "dim")))
     console.print(render.safe(f"Q: {result.question}", "bold"))
+    console.print(render.answer_panel(result, explain=True))
     console.print(render.retrieval_table(result, limit=len(result.retrieved)))
     for r in result.retrieved:
         if r.chunk.chunk_id in result.context_chunk_ids:
@@ -644,7 +680,7 @@ def costs(as_json: bool = typer.Option(False, "--json")) -> None:
     if not rows:
         console.print(Text("The usage ledger is empty. Ingest a site or ask a question first.", style="dim"))
         return
-    t = Table(title=f"Usage ledger (prices as of {pricing.version}, {pricing.currency})", title_justify="left", header_style="bold")
+    t = Table(title=f"Usage ledger (prices as of {pricing.version}, {pricing.currency})", title_justify="left", header_style="bold", box=render.ui_box())
     for col, j in (("phase", "left"), ("provider", "left"), ("model", "left"), ("op", "left"), ("runs", "right"),
                    ("attempts", "right"), ("errors", "right"), ("input tok", "right"), ("cached", "right"),
                    ("output tok", "right"), ("cost USD", "right"), ("unknown", "right")):
@@ -660,8 +696,8 @@ def costs(as_json: bool = typer.Option(False, "--json")) -> None:
 
 @app.command()
 def evaluate(
-    site: Optional[str] = typer.Option("1", "--site", "-s"),
-    split: str = typer.Option("test", "--split", help="test | dev | isolation"),
+    site: Optional[str] = typer.Option(None, "--site", "-s", help='Optional site filter; default all labeled sites.'),
+    split: str = typer.Option("test", "--split", help="test | dev | isolation | evolution_dev | holdout_v1"),
     modes: str = typer.Option("dense", "--modes", help="Comma-separated retrieval modes to compare."),
     provider: Optional[str] = typer.Option(None, "--provider", "-p"),
     retrieval_only: bool = typer.Option(False, "--retrieval-only", help="Score retrieval without generation (no API calls)."),
@@ -707,7 +743,10 @@ def main() -> None:
         if isinstance(rc, int) and rc:
             sys.exit(rc)
     except RagError as err:
-        _print_error(err)
+        if '--json' in sys.argv:
+            _emit_json({'status': 'error', 'error': err.to_dict()})
+        else:
+            _print_error(err)
         sys.exit(2)
     except KeyboardInterrupt:
         render.make_console(CTX.no_color, stderr=True).print("Interrupted.")

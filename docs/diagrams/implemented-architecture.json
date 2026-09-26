@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Website RAG: evidence stays inside one corpus",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "viewBox": [
+      990,
+      490
+    ],
+    "repository": {
+      "url": "https://github.com/abhiteshbhardwaj9319/Website_crawler",
+      "revision": "50960c3073bea378eedd48c9d0b6534ac31e3c8f"
+    }
+  },
+  "components": [
+    {
+      "id": "select",
+      "type": "frontend",
+      "label": "Numbered CLI",
+      "sublabel": "cli.py / registry.py",
+      "pos": [
+        60,
+        35
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/cli.py"
+        },
+        {
+          "path": "src/website_rag/registry.py"
+        }
+      ]
+    },
+    {
+      "id": "crawl",
+      "type": "backend",
+      "label": "Scoped crawl",
+      "sublabel": "crawl.py / checkpoint.py",
+      "pos": [
+        360,
+        35
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/crawl.py"
+        },
+        {
+          "path": "src/website_rag/checkpoint.py"
+        }
+      ]
+    },
+    {
+      "id": "index",
+      "type": "database",
+      "label": "Versioned index",
+      "sublabel": "Qdrant + BM25 + manifest",
+      "pos": [
+        700,
+        35
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/ingest.py"
+        },
+        {
+          "path": "src/website_rag/index.py"
+        }
+      ]
+    },
+    {
+      "id": "retrieve",
+      "type": "backend",
+      "label": "Retrieve evidence",
+      "sublabel": "dense / BM25 / rerank",
+      "pos": [
+        700,
+        190
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/retrieve.py"
+        }
+      ]
+    },
+    {
+      "id": "generate",
+      "type": "backend",
+      "label": "Generate claims",
+      "sublabel": "bounded LangGraph workflow",
+      "pos": [
+        360,
+        190
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/graph.py"
+        },
+        {
+          "path": "src/website_rag/generate.py"
+        }
+      ]
+    },
+    {
+      "id": "validate",
+      "type": "security",
+      "label": "Check citations",
+      "sublabel": "exact chunk + passage IDs",
+      "pos": [
+        60,
+        190
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/citations.py"
+        },
+        {
+          "path": "src/website_rag/evidence.py"
+        }
+      ]
+    },
+    {
+      "id": "display",
+      "type": "frontend",
+      "label": "Answer + sources",
+      "sublabel": "accepted claims only",
+      "pos": [
+        60,
+        345
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/render.py"
+        }
+      ]
+    },
+    {
+      "id": "providers",
+      "type": "external",
+      "label": "OpenAI / Groq",
+      "sublabel": "visible bounded fallback",
+      "pos": [
+        360,
+        345
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/providers.py"
+        }
+      ]
+    },
+    {
+      "id": "trace",
+      "type": "database",
+      "label": "Local audit",
+      "sublabel": "traces + token/cost ledger",
+      "pos": [
+        700,
+        345
+      ],
+      "size": [
+        220,
+        80
+      ],
+      "sources": [
+        {
+          "path": "src/website_rag/tracing.py"
+        },
+        {
+          "path": "src/website_rag/usage.py"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "select",
+      "to": "crawl",
+      "label": "ingest site"
+    },
+    {
+      "from": "crawl",
+      "to": "index",
+      "label": "atomic activation"
+    },
+    {
+      "from": "index",
+      "to": "retrieve",
+      "label": "selected corpus",
+      "labelDx": 80,
+      "labelDy": 28
+    },
+    {
+      "from": "retrieve",
+      "to": "generate",
+      "label": "bounded context"
+    },
+    {
+      "from": "generate",
+      "to": "validate",
+      "label": "claim evidence"
+    },
+    {
+      "from": "validate",
+      "to": "display",
+      "label": "accepted only",
+      "labelDx": 80,
+      "labelDy": 28
+    },
+    {
+      "from": "generate",
+      "to": "providers",
+      "label": "one provider chain",
+      "labelDx": 80,
+      "labelDy": 28
+    },
+    {
+      "from": "providers",
+      "to": "trace",
+      "label": "attempt usage"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Isolation in code",
+      "items": [
+        "Separate corpus collections; payload checks at retrieval and context."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Safe evolution",
+      "items": [
+        "Resume a persisted frontier; failed refresh keeps the active index."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Honest grounding",
+      "items": [
+        "Passage identity is checked. Meaning still needs explicit review."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "checks": [
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-a8deb83fc18a470c"
+      ],
+      "width": 80,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-e82762d31b534721"
+      ],
+      "width": 80,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-86661e1a81be42fa"
+      ],
+      "width": 80,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-b77856d4bf4a4eff"
+      ],
+      "width": 80,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-23e7d64f9f564af6"
+      ],
+      "width": 80,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-a8deb83fc18a470c"
+      ],
+      "width": 100,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-e82762d31b534721"
+      ],
+      "width": 100,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-86661e1a81be42fa"
+      ],
+      "width": 100,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-b77856d4bf4a4eff"
+      ],
+      "width": 100,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-23e7d64f9f564af6"
+      ],
+      "width": 100,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-a8deb83fc18a470c"
+      ],
+      "width": 140,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-e82762d31b534721"
+      ],
+      "width": 140,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-86661e1a81be42fa"
+      ],
+      "width": 140,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-b77856d4bf4a4eff"
+      ],
+      "width": 140,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--no-color",
+        "demo",
+        "--replay",
+        "r-23e7d64f9f564af6"
+      ],
+      "width": 140,
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "--ascii",
+        "--no-color",
+        "sites",
+        "list"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "sites",
+        "coverage",
+        "1",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "sites",
+        "coverage",
+        "2",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "doctor",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "costs",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "demo",
+        "--replay",
+        "r-e82762d31b534721",
+        "--json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "sources",
+        "r-e82762d31b534721"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "trace",
+        "r-e82762d31b534721"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "ask",
+        "q",
+        "--site",
+        "999",
+        "--json"
+      ],
+      "exit_code": 2
+    }
+  ],
+  "result": "pass",
+  "environment": "Windows PowerShell, UTF-8 piped subprocess output",
+  "limitations": "Windows Terminal GUI was not opened; video recording remains a user task."
+}

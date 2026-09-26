@@ -45,3 +45,6 @@ Thumbs.db
 node_modules/
 
 # Keep reviewed submission evidence in docs/ and eval/ tracked.
+# Archify raw browser receipts contain machine-specific absolute paths.
+/docs/diagrams/*.visual-check.json
+/docs/diagrams/*.visual-check.html

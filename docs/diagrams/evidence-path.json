@@ -1,0 +1,170 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "A question travels through evidence checks",
+    "quality_profile": "showcase",
+    "locale": "en"
+  },
+  "lanes": [
+    {
+      "id": "query",
+      "label": "Selected website"
+    },
+    {
+      "id": "outcome",
+      "label": "Explicit outcomes",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "retrieval",
+    "context",
+    "generation",
+    "citations",
+    "answer"
+  ],
+  "nodes": [
+    {
+      "id": "retrieval",
+      "lane": "query",
+      "col": 0,
+      "type": "database",
+      "label": "Validate + retrieve",
+      "sublabel": "registry / index / retrieval",
+      "width": 150
+    },
+    {
+      "id": "context",
+      "lane": "query",
+      "col": 1,
+      "type": "security",
+      "label": "Choose context",
+      "sublabel": "site + token checks",
+      "width": 150
+    },
+    {
+      "id": "generation",
+      "lane": "query",
+      "col": 2,
+      "type": "external",
+      "label": "Generate claims",
+      "sublabel": "OpenAI or Groq",
+      "width": 150
+    },
+    {
+      "id": "citations",
+      "lane": "query",
+      "col": 3,
+      "type": "security",
+      "label": "Passage checks",
+      "sublabel": "citations.py",
+      "width": 150
+    },
+    {
+      "id": "answer",
+      "lane": "query",
+      "col": 4,
+      "type": "frontend",
+      "label": "Answer + sources",
+      "sublabel": "render.py",
+      "width": 150
+    },
+    {
+      "id": "abstain",
+      "lane": "outcome",
+      "col": 1,
+      "type": "backend",
+      "label": "Insufficient evidence",
+      "sublabel": "no source-supported answer",
+      "width": 150,
+      "yOffset": 50
+    },
+    {
+      "id": "providererror",
+      "lane": "outcome",
+      "col": 2,
+      "type": "backend",
+      "label": "Provider error",
+      "sublabel": "typed; never abstention",
+      "width": 150,
+      "yOffset": 50
+    },
+    {
+      "id": "invalid",
+      "lane": "outcome",
+      "col": 3,
+      "type": "backend",
+      "label": "Citation failure",
+      "sublabel": "partial or withheld",
+      "width": 150,
+      "yOffset": 50
+    }
+  ],
+  "edges": [
+    {
+      "from": "retrieval",
+      "to": "context",
+      "label": "ranked chunks",
+      "role": "main"
+    },
+    {
+      "from": "context",
+      "to": "generation",
+      "label": "evidence",
+      "role": "main"
+    },
+    {
+      "from": "generation",
+      "to": "citations",
+      "label": "claims + IDs",
+      "role": "main"
+    },
+    {
+      "from": "citations",
+      "to": "answer",
+      "label": "accepted claims",
+      "role": "main"
+    },
+    {
+      "from": "context",
+      "to": "abstain",
+      "label": "no chunks",
+      "role": "branch"
+    },
+    {
+      "from": "generation",
+      "to": "abstain",
+      "label": "unsupported",
+      "role": "branch"
+    },
+    {
+      "from": "generation",
+      "to": "providererror",
+      "label": "call fails",
+      "role": "error"
+    },
+    {
+      "from": "citations",
+      "to": "invalid",
+      "label": "invalid IDs",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "One evidence boundary",
+      "items": [
+        "graph.py binds one site and corpus to every stage."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Illustrative path",
+      "items": [
+        "Static explanation, not live telemetry. Every outcome is traced locally."
+      ]
+    }
+  ]
+}

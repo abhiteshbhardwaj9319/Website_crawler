@@ -14,11 +14,17 @@ from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from rich import box
 
 from .schemas import AnswerResult, SiteRecord
 
 _ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07]*(\x07|\x1b\\)|\x1b[@-Z\\-_]")
 _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+ASCII_UI = False
+
+
+def ui_box():
+    return box.ASCII if ASCII_UI else box.ROUNDED
 
 STATUS_STYLE = {
     "answered": ("ANSWERED", "bold green"),
@@ -43,7 +49,8 @@ def safe(text: str | None, style: str = "") -> Text:
 
 
 def sites_table(sites: list[SiteRecord], selected: int | None = None) -> Table:
-    table = Table(title="Websites", title_justify="left", header_style="bold", expand=False)
+    table = Table(title="Websites", title_justify="left", header_style="bold", expand=False,
+                  box=ui_box())
     table.add_column("#", justify="right", style="cyan")
     table.add_column("Website", overflow="fold")
     table.add_column("Scope", style="dim", overflow="fold")
@@ -143,7 +150,7 @@ def retrieval_table(result: AnswerResult, limit: int = 10) -> Table:
 def meta_line(result: AnswerResult) -> Text:
     u = result.usage or {}
     t = Text(style="dim")
-    provider = f"{result.provider}/{result.model}" if result.provider else "no generation call"
+    provider = clean(f"{result.provider}/{result.model}") if result.provider else "no generation call"
     t.append(f"{result.latency_ms / 1000:.1f}s | {provider} | mode {result.retrieval_mode} | ")
     t.append(f"tokens in {u.get('input_tokens', 0)} out {u.get('output_tokens', 0)} | ")
     cost = u.get("cost_usd", 0.0)

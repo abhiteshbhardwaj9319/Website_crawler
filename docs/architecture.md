@@ -1,8 +1,10 @@
 # Architecture
 
-**Status: implemented and tested offline (2026-09-26).** Live provider behavior is verified separately; see [evaluation](evaluation.md) for what has and has not been run against real OpenAI/Groq endpoints.
+**Status: implemented, offline-tested and exercised with both providers (2026-09-26).** See [evaluation](evaluation.md) for measured quality and remaining semantic failures.
 
-![Architecture overview](diagrams/architecture-overview.svg)
+![Implemented architecture](diagrams/implemented-architecture.visual-check.1440x900.light.png)
+
+[Interactive architecture and question workflow](diagrams/README.md) are source-backed Archify artifacts with editable JSON and browser-reviewed PNG fallbacks.
 
 The system has three parts: per-site **ingestion**, isolated per-site **corpora**, and a bounded **query workflow**. Local traces, a usage ledger, and an evaluation harness observe all three.
 
@@ -35,6 +37,10 @@ Isolation is enforced in code at four points, not by the prompt:
 Tests cover an answer that exists only on site B asked on site A (every retrieval mode), contradictory values for the same setting on two sites, a citation to another site's chunk, and a tampered lexical index ([tests/test_pipeline.py](../tests/test_pipeline.py)).
 
 ## Ingestion
+
+Registry scope supports explicit extra path prefixes, seeds and bounded sitemaps. `checkpoint.py` persists each extracted page and an atomic frontier/outcome/configuration record; accepted pages are reused on resume. A crawl checkpoint is separate from a completed query index. Additive path/limit changes may resume; incompatible extraction policy or narrowed scope requires refresh. Sitemaps reject entity/DTD declarations and enforce host/path/redirect, robots, bytes, count, depth and discovered-URL limits. Discovery can stop at a cap, so frontier exhaustion is only within the declared scope and discovery policy.
+
+`--refresh` fetches a new snapshot; `--resume` continues durable work. Conditional ETag/304 fetching is not implemented. Existing active indexes remain queryable until the replacement has been fully written and checked; transport failures do not delete old pages. Raw HTML is compressed per page, embeddings/Qdrant writes use batches, and a 30,000-chunk cap bounds the remaining in-memory index matrix. Accepted-page caps constrain the fetch batch before requests are sent, so fetched outcomes are not silently discarded. See [coverage](corpus.md) for the exact current corpus versions and bounds.
 
 | Stage | Module | What it does |
 | --- | --- | --- |
@@ -71,7 +77,7 @@ flowchart TD
 
 **Citation checks.** Chunk and passage IDs must have been supplied for this run. Legacy `AnswerDraft` remains readable for fixtures; quotes must match contiguously with whitespace-only normalization, preserving case, punctuation, and negation. Ellipsis is literal, never a license to omit text. Structural linkage does not prove semantic entailment; explicit review remains necessary. Existing indexes need no migration: spans are computed from stored chunk text at query time. Old saved runs remain loadable and terminal replay reconstructs accepted claims instead of displaying old unchecked prose.
 
-**Abstention wording.** `The indexed pages for <site> do not contain enough information to answer this question.` It describes the indexed snapshot, not the live website.
+**Abstention wording.** `The indexed pages for <site> do not contain enough information to answer this question.` This is the model's evidence-limited judgment, not proof that the answer is absent from the whole index or live site. Evaluation records false abstentions separately.
 
 ## Providers and failures
 

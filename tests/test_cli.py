@@ -97,3 +97,44 @@ def test_chat_session_switching_and_sources_render_as_text(run, capsys, monkeypa
     assert "has no completed index" in out  # question on unready site: explicit error
     assert "Run r-" in out and '"run_id"' not in out  # /sources renders text, not JSON
     assert "Unknown command /bogus" in out
+
+
+def test_ascii_and_no_color_environment(run, capsys, monkeypatch):
+    monkeypatch.setenv('NO_COLOR', '1')
+    for args in [('sites', 'list'), ('doctor',), ('costs',)]:
+        assert run('--ascii', *args) == 0
+        out = capsys.readouterr().out
+        assert '\x1b[' not in out
+        assert not any('\u2500' <= c <= '\u257f' for c in out)
+
+
+def test_json_error_before_graph_starts(run, capsys):
+    assert run('ask', 'q', '--site', '999', '--json') == 2
+    out = capsys.readouterr()
+    assert json.loads(out.out)['error']['code'] == 'site_not_found'
+    assert not out.err
+
+
+def test_demo_replay_labels_recorded_evidence(run, capsys):
+    from website_rag.graph import save_run
+    from website_rag.schemas import AnswerResult
+    result = AnswerResult(run_id='r-replay-test', question='q', status='insufficient_evidence',
+                          corpus_id='frozen-corpus', model='recorded-model', site_name='Example',
+                          site_id='example', site_number=1)
+    save_run(get_settings(), result)
+    assert run('demo', '--replay', result.run_id) == 0
+    text = capsys.readouterr().out
+    assert 'RECORDED REPLAY' in text and 'frozen-corpus' in text and 'recorded-model' in text
+    assert run('demo', '--replay', result.run_id, '--json') == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload['replay'] is True and payload['recorded_at'] and payload['run_id'] == result.run_id
+
+
+def test_demo_dispatches_real_question_and_explicit_options(run, monkeypatch):
+    calls = []
+    monkeypatch.setattr(cli, 'ask', lambda question, **kwargs: calls.append((question, kwargs)))
+    assert run('demo', 'input', '--provider', 'groq') == 0
+    question, options = calls[0]
+    assert question == 'what is python command to get input'
+    assert options == dict(site='2', provider='groq', mode=None, show_retrieval=False,
+                           explain=False, as_json=False)
