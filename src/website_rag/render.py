@@ -54,9 +54,11 @@ def sites_table(sites: list[SiteRecord], selected: int | None = None) -> Table:
         label, style = STATUS_STYLE.get(site.status.value, (site.status.value, ""))
         if site.status.value == "ingesting" and site.active_corpus_id:
             label = "ready (refresh in progress)"
+        elif site.is_queryable:
+            label = 'ready / crawl complete' if site.crawl_complete else 'ready / crawl limited'
         marker = " *" if selected == site.number else ""
         table.add_row(
-            f"{site.number}{marker}", safe(site.display_name), safe(f"{site.allowed_host}{site.allowed_path_prefix}"),
+            f"{site.number}{marker}", safe(site.display_name), safe(site.allowed_host + ' ' + ', '.join([site.allowed_path_prefix, *site.additional_path_prefixes])),
             Text(label, style=style), str(site.accepted_pages or "-"), str(site.chunk_count or "-"),
         )
     return table

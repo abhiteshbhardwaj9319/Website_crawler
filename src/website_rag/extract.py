@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 
 from .schemas import Section
 
-EXTRACTOR_VERSION = "extract-v1"
+EXTRACTOR_VERSION = "extract-v2"
 
 MAIN_SELECTORS = [
     '[itemprop="articleBody"]', '[role="main"]', "main", "article", "#content", ".document", "body",
@@ -139,6 +139,8 @@ def _walk(node: Tag, builder: _SectionBuilder) -> None:
         elif name == "dl":
             for item in child.children:
                 if isinstance(item, Tag) and item.name == "dt":
+                    if item.get('id') in builder.ids:
+                        builder.heading(6, _inline_text(item), str(item['id']))
                     builder.block(_inline_text(item))
                 elif isinstance(item, Tag) and item.name == "dd":
                     _walk(item, builder)

@@ -219,13 +219,80 @@ def sites_add(
 # ----------------------------------------------------------------------------- ingest
 
 
+@sites_app.command('configure')
+def sites_configure(
+    site: str = typer.Argument(...),
+    max_pages: Optional[int] = typer.Option(None, '--max-pages', min=1, max=500),
+    max_depth: Optional[int] = typer.Option(None, '--max-depth', min=0, max=20),
+    max_total_s: Optional[float] = typer.Option(None, '--max-total-s', min=1, max=3600),
+    allow_path: list[str] = typer.Option([], '--allow-path', help='Add a directory prefix on the same host.'),
+    seed: list[str] = typer.Option([], '--seed', help='Add an in-scope seed page.'),
+    sitemap: list[str] = typer.Option([], '--sitemap', help='Add an in-scope XML sitemap.'),
+    name: Optional[str] = typer.Option(None, '--name'),
+    as_json: bool = typer.Option(False, '--json'),
+) -> None:
+    """Adjust finite crawl limits or add scope; keeps the stable number and active index."""
+    from .urls import Scope, normalize_url
+    s = _settings()
+    reg = _registry(s)
+    record = reg.get(site).model_copy(deep=True)
+    for prefix in allow_path:
+        if not prefix.startswith('/') or not prefix.endswith('/') or '..' in prefix or any(c in prefix for c in '?#%\\'):
+            raise RagError(ErrorCode.INVALID_INPUT, 'Allowed paths must be absolute directory prefixes ending in /.')
+        if prefix != record.allowed_path_prefix and prefix not in record.additional_path_prefixes:
+            record.additional_path_prefixes.append(prefix)
+    policy = Scope(record.allowed_host, record.allowed_path_prefix, tuple(record.exclude_patterns), tuple(record.additional_path_prefixes))
+    for values, target, xml in ((seed, record.seed_urls, False), (sitemap, record.sitemap_urls, True)):
+        for value in values:
+            url = normalize_url(value)
+            checked = url[:-4] + '.html' if xml and url.endswith('.xml') else url
+            if not policy.contains(checked)[0]:
+                raise RagError(ErrorCode.URL_REJECTED, 'Seed/sitemap must belong to the selected host and paths.')
+            if url not in target:
+                target.append(url)
+    limits = record.crawl.model_dump()
+    for key, value in [('max_pages', max_pages), ('max_depth', max_depth), ('max_total_s', max_total_s)]:
+        if value is not None:
+            limits[key] = value
+    record.crawl = CrawlLimits(**limits)
+    if name:
+        record.display_name = name
+    if allow_path or seed or sitemap:
+        record.scope_version += 1
+        record.crawl_complete = False
+    reg.update(record)
+    if as_json:
+        _emit_json(_site_json(record))
+    else:
+        _console().print(render.safe(f'Website {record.number}: scope v{record.scope_version}; cap {record.crawl.max_pages}. '
+                                    'Active corpus unchanged. Use ingest --resume or --refresh.'))
+
+
+@sites_app.command('coverage')
+def sites_coverage(site: str = typer.Argument(...), as_json: bool = typer.Option(False, '--json')) -> None:
+    """Inspect discovered coverage for the latest crawl, separately from index readiness."""
+    from .checkpoint import coverage
+    s = _settings()
+    record = _registry(s).get(site)
+    root = s.sites_dir / record.site_id / 'crawl-work'
+    pointer = root / 'current.json'
+    directory = root / json.loads(pointer.read_text(encoding='utf-8'))['directory'] if pointer.exists() else root
+    cov = coverage(directory)
+    cov.update(site_number=record.number, index_ready=record.is_queryable, active_corpus=record.active_corpus_id)
+    if as_json:
+        _emit_json(cov)
+    else:
+        for key, value in cov.items():
+            _console().print(render.safe(f'{key}: {value}'))
+
+
 def _report_json(report) -> dict | None:  # noqa: ANN001
     if report is None:
         return None
     return {k: v for k, v in report.__dict__.items() if k != "site"} | {"site_number": report.site.number}
 
 
-def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool):  # noqa: ANN202
+def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool, resume: bool = False):  # noqa: ANN202
     from .ingest import ingest_site
 
     console = render.make_console(CTX.no_color, stderr=as_json)
@@ -235,7 +302,7 @@ def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool)
         SpinnerColumn(), TextColumn("{task.description}"), BarColumn(), MofNCompleteColumn(), TimeElapsedColumn(),
         console=console, transient=False, disable=not console.is_terminal,
     )
-    crawl_task = progress.add_task(f"Crawling {site.allowed_host}{site.allowed_path_prefix}", total=site.crawl.max_pages)
+    crawl_task = progress.add_task(f"Discovering pages (accepted-page cap {site.crawl.max_pages})", total=None)
     embed_task = None
     counts = {"skipped": 0, "failed": 0}
 
@@ -250,7 +317,7 @@ def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool)
                 counts["skipped" if data["outcome"] == "skipped" else "failed"] += 1
             progress.update(crawl_task, description=f"Crawling (skipped {counts['skipped']}, failed {counts['failed']})")
         elif kind == "stage" and data["name"] == "chunk":
-            progress.update(crawl_task, total=progress.tasks[crawl_task].completed)
+            progress.update(crawl_task, description="Crawl checkpoint saved; chunking accepted pages")
         elif kind == "embed":
             if embed_task is None:
                 embed_task = progress.add_task("Embedding chunks (local)", total=data["total"])
@@ -259,7 +326,7 @@ def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool)
     console.print(Text.assemble(("Ingesting website ", ""), (str(site.number), "bold cyan"), ": ", render.safe(site.display_name)))
     try:
         with progress:
-            report = ingest_site(site, s, reg, tracer, ledger, progress=on_progress)
+            report = ingest_site(site, s, reg, tracer, ledger, progress=on_progress, resume=resume)
     except KeyboardInterrupt:
         console.print(Text("Ingestion interrupted. The previous index (if any) is still active.", style="yellow"))
         raise
@@ -274,6 +341,8 @@ def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool)
     summary.add_row("Chunks", f"{report.chunk_count} ({report.embedded} embedded, {report.reused_embeddings} reused)")
     summary.add_row("Embedding tokens (o200k count)", f"{report.embedding_tokens:,} - local model, $0 API cost")
     summary.add_row("Stopped because", report.stopped_reason)
+    summary.add_row("Pending frontier", str(report.pending))
+    summary.add_row("Coverage", "eligible frontier exhausted" if report.crawl_complete else "index ready, crawl incomplete")
     summary.add_row("Time", f"{report.elapsed_s:.1f}s")
     summary.add_row("Corpus / run", f"{report.corpus_id} / {report.run_id}")
     console.print(summary)
@@ -287,12 +356,13 @@ def _run_ingest(site: SiteRecord, s: Settings, reg: SiteRegistry, as_json: bool)
 def ingest(
     site: Optional[str] = typer.Option(None, "--site", "-s", help="Site number or id (default 1)."),
     as_json: bool = typer.Option(False, "--json"),
+    resume: bool = typer.Option(False, "--resume/--refresh", help="Resume saved frontier, or start a fresh snapshot (default)."),
 ) -> None:
     """Crawl and (re)index a website. The previous index stays active until the new one completes."""
     s = _settings()
     reg = _registry(s)
     record = reg.get(site)
-    report = _run_ingest(record, s, reg, as_json)
+    report = _run_ingest(record, s, reg, as_json, resume=resume)
     if as_json:
         _emit_json(_report_json(report))
 

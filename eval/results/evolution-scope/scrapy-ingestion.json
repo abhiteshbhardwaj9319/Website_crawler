@@ -1,0 +1,20 @@
+{
+  "corpus_id": "scrapy-docs-2-19--20260926T002328-527e90",
+  "accepted_pages": 144,
+  "skipped": 5,
+  "failed": 0,
+  "chunk_count": 1895,
+  "embedded": 950,
+  "reused_embeddings": 945,
+  "embedding_tokens": 225797,
+  "stopped_reason": "frontier_exhausted",
+  "elapsed_s": 249.9201501000207,
+  "skip_reasons": {
+    "low_content": 5
+  },
+  "warnings": [],
+  "run_id": "r-b8e0fbadafa9489e",
+  "pending": 0,
+  "crawl_complete": true,
+  "site_number": 1
+}

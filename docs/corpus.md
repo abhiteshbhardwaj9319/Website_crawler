@@ -1,3 +1,30 @@
+# Current corpus coverage (E3, 2026-09-26)
+
+| Site | Before | Active index | Remaining frontier | Crawl state |
+| --- | --- | --- | --- | --- |
+| 1 Scrapy 2.19 | 45 pages / 945 chunks | 144 pages / 1,895 chunks | 0 | Discovered eligible frontier exhausted; 5 low-content skips; 0 failures |
+| 2 Python 3.13 | 17 pages / 251 chunks | 90 pages / 4,611 chunks | 186 | Index ready, crawl limited at 90 accepted pages; 8 skips; 0 failures |
+
+[Machine-readable coverage, fingerprints and ingestion accounting](../eval/results/evolution-scope/) preserve the measured scope and limits. Scrapy includes linked source-code pages under `/en/2.19/_modules/`; the original `news.html` exclusion remains unchanged. This is finite configured scope, not a claim about every host URL. Python allows only `/3.13/tutorial/`, `/3.13/library/`, and `/3.13/builtins/` on `docs.python.org`. Its original stable site ID/number is preserved.
+
+The supplied `/3.13/library/functions.html` now returns HTTP 301 to [the official builtins page](https://docs.python.org/3.13/builtins/functions.html#input), independently checked with HTTP and browsing. Scope was explicitly versioned to include that pinned path. The requested and final URLs remain in page provenance; the indexed `input` definition has its actual anchor. Original indexes and historical evaluation files remain intact.
+
+```
+uv run rag sites coverage 1
+uv run rag sites show 2 --json
+uv run rag sites configure 2 --max-pages 120 --max-total-s 600
+uv run rag ingest --site 2 --resume
+uv run rag ingest --site 2 --refresh
+```
+
+Resume loads persisted accepted pages and retries failed/deferred URLs; refresh starts a new snapshot. No conditional GET is implemented: a refresh fetches full bodies, and HTTP 304 without a body is a fetch failure. Disk checkpoints and compressed raw bodies are saved per page; raw HTML is not retained for an entire site. Chunking loads one page at a time, embeddings/index writes use batches, and a 30,000-chunk configurable guard bounds the in-memory chunk/vector matrix. This remains a bounded local assessment tool, not a streaming unlimited-corpus service.
+
+Checkpoint scope identity rejects narrowed paths/changed exclusions or extraction thresholds; safe additive scope/limit changes preserve completed pages. An interrupted checkpoint recovers durable page records. Any failed URL during refresh/resume of an existing corpus prevents activation, leaving the prior index queryable. Accepted-page batch capacity is reserved before fetch, so fetched results are not silently discarded. Robots, public-host and redirect checks apply before page requests; XML discovery has document/count/depth/byte/URL limits and rejects DTD/entities. Sitemap limits make coverage incomplete. No sitemap source is necessary for these linked documentation corpora.
+
+`processed_of_discovered` counts current outcomes over discovered in-scope URLs; it is not an estimate of the website's unknown total. Deferred URLs are not skipped or failed. A crawl cap is displayed as a resource bound, never as a known-total progress bar.
+
+## Historical corpus report (pre-evolution)
+
 # Corpus coverage
 
 Snapshot used for the evaluation: crawled 2026-09-25 22:43-22:47 UTC. Websites change; re-running `rag ingest` produces a new snapshot and may change results.

@@ -40,6 +40,7 @@ class Scope:
     host: str
     path_prefix: str
     exclude_patterns: tuple[str, ...] = ()
+    additional_prefixes: tuple[str, ...] = ()
 
     def contains(self, url: str) -> tuple[bool, str]:
         """Return (in_scope, reason)."""
@@ -49,7 +50,7 @@ class Scope:
         if (parts.hostname or "") != self.host:
             return False, "other_host"
         path = parts.path or "/"
-        if not path.startswith(self.path_prefix):
+        if not any(path.startswith(p) for p in (self.path_prefix, *self.additional_prefixes)):
             return False, "outside_path_prefix"
         ext = posixpath.splitext(path)[1].lower()
         if ext in NON_HTML_EXTENSIONS:

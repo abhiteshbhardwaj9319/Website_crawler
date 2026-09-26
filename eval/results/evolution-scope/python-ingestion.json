@@ -1,0 +1,22 @@
+{
+  "corpus_id": "python-tutorial-3-13--20260926T002925-aba199",
+  "accepted_pages": 90,
+  "skipped": 8,
+  "failed": 0,
+  "chunk_count": 4611,
+  "embedded": 4360,
+  "reused_embeddings": 251,
+  "embedding_tokens": 556050,
+  "stopped_reason": "max_pages_reached",
+  "elapsed_s": 755.4587292999786,
+  "skip_reasons": {
+    "duplicate_content": 1,
+    "low_content": 7,
+    "not_fetched_limit_reached": 186
+  },
+  "warnings": [],
+  "run_id": "r-cf68b78fb5094e29",
+  "pending": 186,
+  "crawl_complete": false,
+  "site_number": 2
+}

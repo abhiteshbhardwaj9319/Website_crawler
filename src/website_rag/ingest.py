@@ -8,6 +8,8 @@ matches, so a failed or interrupted refresh never removes the last usable index.
 from __future__ import annotations
 
 import time
+import json
+import shutil
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Callable
@@ -15,6 +17,7 @@ from typing import Callable
 import numpy as np
 
 from .chunk import CHUNKER_VERSION, chunk_pages, count_tokens, embedding_text
+from .checkpoint import coverage, scope_fingerprint, scope_identity
 from .config import Settings
 from .crawl import CrawlResult, crawl_site, save_crawl
 from .embeddings import Embedder, get_embedder
@@ -45,6 +48,8 @@ class IngestReport:
     skip_reasons: dict[str, int] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     run_id: str = ""
+    pending: int = 0
+    crawl_complete: bool = False
 
 
 def _reason_key(reason: str) -> str:
@@ -61,6 +66,7 @@ def ingest_site(
     embedder: Embedder | None = None,
     crawl_kwargs: dict | None = None,
     min_pages: int = 1,
+    resume: bool = False,
 ) -> IngestReport:
     progress = progress or (lambda kind, data: None)
     started = time.monotonic()
@@ -69,6 +75,13 @@ def ingest_site(
         raise RagError(ErrorCode.INTERNAL, "Corpus id collision; retry ingestion.", stage="ingest")
     store = CorpusStore(settings, site.site_id, corpus_id)
     previous_corpus = site.active_corpus_id
+    work_root = settings.sites_dir / site.site_id / 'crawl-work'
+    pointer = work_root / 'current.json'
+    previous_work = json.loads(pointer.read_text(encoding='utf-8'))['directory'] if resume and pointer.exists() else None
+    work_dir = work_root / (previous_work or corpus_id)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    from .registry import _atomic_write
+    _atomic_write(pointer, json.dumps({'directory': work_dir.name}))
     tracer.bind(site_id=site.site_id, corpus_id=corpus_id)
 
     embedder = embedder or get_embedder(
@@ -83,6 +96,7 @@ def ingest_site(
         chunk_target_tokens=settings.chunk_target_tokens,
         chunk_overlap_tokens=settings.chunk_overlap_tokens,
         config_fingerprint=config_fingerprint(settings, embedder.model_name),
+        scope_fingerprint=scope_fingerprint(site), scope=scope_identity(site),
     )
     store.save_manifest(manifest)
     site.pending_corpus_id = corpus_id
@@ -90,8 +104,14 @@ def ingest_site(
 
     try:
         with tracer.span("crawl", seed_url=site.seed_url, max_pages=site.crawl.max_pages) as span:
-            result: CrawlResult = crawl_site(site, corpus_id, progress=progress, **(crawl_kwargs or {}))
+            kwargs = dict(crawl_kwargs or {})
+            kwargs.setdefault('checkpoint_dir', work_dir)
+            if resume and not previous_work and previous_corpus:
+                kwargs.setdefault('legacy_dir', CorpusStore(settings, site.site_id, previous_corpus).dir)
+            result: CrawlResult = crawl_site(site, corpus_id, progress=progress, **kwargs)
             save_crawl(result, store.dir)
+            if (work_dir / 'frontier.json').exists():
+                shutil.copyfile(work_dir / 'frontier.json', store.dir / 'frontier.json')
             skip_reasons: dict[str, int] = {}
             for e in result.log:
                 if e.outcome != FetchOutcome.ACCEPTED:
@@ -113,9 +133,19 @@ def ingest_site(
                     stage="crawl",
                     details={"skip_reasons": skip_reasons},
                 )
+            # A partial transport failure must not turn old accepted pages into deletions.
+            if previous_corpus and any(e.outcome == FetchOutcome.FAILED for e in result.log):
+                raise RagError(ErrorCode.FETCH_FAILED, 'Crawl has failed URLs; previous index remains active.',
+                               hint='Inspect coverage, then ingest --resume to retry failed URLs.', stage='crawl')
         progress("stage", {"name": "chunk"})
         with tracer.span("chunk", target=settings.chunk_target_tokens, overlap=settings.chunk_overlap_tokens) as span:
-            chunks = chunk_pages(result.pages, settings.chunk_target_tokens, settings.chunk_overlap_tokens)
+            chunks = []
+            for page in result.pages:
+                batch = chunk_pages([page], settings.chunk_target_tokens, settings.chunk_overlap_tokens)
+                if len(chunks) + len(batch) > settings.max_index_chunks:
+                    raise RagError(ErrorCode.CONFIG_INVALID, 'Index chunk limit exceeded; previous index remains active.',
+                                   hint='Narrow the crawl scope or explicitly raise RAG_MAX_INDEX_CHUNKS.', stage='chunk')
+                chunks.extend(batch)
             span.set(chunks=len(chunks))
 
         with tracer.span("embed", model=embedder.model_name, chunks=len(chunks)) as span:
@@ -155,6 +185,10 @@ def ingest_site(
         site.accepted_pages = len(result.pages)
         site.chunk_count = len(chunks)
         site.embedding_model = embedder.model_name
+        cov = coverage(work_dir)
+        site.crawl_complete = cov['crawl_complete']
+        site.crawl_stop_reason = result.stopped_reason
+        site.pending_urls = len(result.pending)
         registry.mark_status(site, SiteStatus.READY)
 
         warnings = []
@@ -168,6 +202,7 @@ def ingest_site(
             reused_embeddings=reused, embedding_tokens=embed_tokens,
             stopped_reason=result.stopped_reason, elapsed_s=time.monotonic() - started,
             skip_reasons=skip_reasons, warnings=warnings, run_id=tracer.run_id,
+            pending=len(result.pending), crawl_complete=site.crawl_complete,
         )
     except BaseException as exc:  # includes KeyboardInterrupt: record, keep last usable index
         reason = "interrupted by user" if isinstance(exc, KeyboardInterrupt) else str(getattr(exc, "message", exc))

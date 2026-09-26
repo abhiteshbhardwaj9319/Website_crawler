@@ -11,6 +11,9 @@ from __future__ import annotations
 import asyncio
 import gzip
 import hashlib
+import json
+from itertools import islice
+from urllib.parse import urlsplit
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -20,6 +23,7 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 
+from .checkpoint import DiskPages, load_checkpoint, save_checkpoint
 from .errors import ErrorCode, RagError
 from .extract import ExtractedPage, extract_page
 from .schemas import CrawlLogEntry, FetchOutcome, PageRecord, SiteRecord, utcnow
@@ -58,6 +62,7 @@ class CrawlResult:
     raw_html: dict[str, str] = field(default_factory=dict)  # page_id -> html
     stopped_reason: str = "frontier_exhausted"
     robots_url: str | None = None
+    pending: list[tuple[str, int]] = field(default_factory=list)
 
 
 ProgressFn = Callable[[str, dict], None]
@@ -86,15 +91,20 @@ class Crawler:
         transport: httpx.AsyncBaseTransport | None = None,
         check_network: bool = True,
         progress: ProgressFn | None = None,
+        checkpoint_dir: Path | None = None,
+        legacy_dir: Path | None = None,
     ) -> None:
+        self.checkpoint_dir = checkpoint_dir
+        self.legacy_dir = legacy_dir
         self.site = site
         self.corpus_id = corpus_id
         self.limits = site.crawl
-        self.scope = Scope(site.allowed_host, site.allowed_path_prefix, tuple(site.exclude_patterns))
+        self.scope = Scope(site.allowed_host, site.allowed_path_prefix, tuple(site.exclude_patterns), tuple(site.additional_path_prefixes))
         self.transport = transport
         self.check_network = check_network
         self.progress = progress or (lambda kind, data: None)
         self.robots: RobotFileParser | None = None
+        self.discovery_limited = False
 
     # ------------------------------------------------------------------ robots
     async def _load_robots(self, client: httpx.AsyncClient) -> str:
@@ -103,7 +113,13 @@ class Crawler:
             robots_url = f"http://{self.site.allowed_host}/robots.txt"
         parser = RobotFileParser()
         try:
-            resp = await client.get(robots_url, timeout=self.limits.timeout_s)
+            async with client.stream('GET', robots_url, timeout=self.limits.timeout_s) as streamed:
+                data = bytearray()
+                async for part in streamed.aiter_bytes():
+                    data.extend(part)
+                    if len(data) > self.limits.max_bytes_per_page:
+                        raise RagError(ErrorCode.FETCH_FAILED, 'robots.txt exceeds byte limit.', stage='crawl')
+                resp = httpx.Response(streamed.status_code, content=bytes(data))
         except httpx.HTTPError as exc:
             raise RagError(
                 ErrorCode.FETCH_FAILED,
@@ -113,7 +129,7 @@ class Crawler:
             ) from exc
         if 400 <= resp.status_code < 500:
             parser.parse([])  # RFC 9309: unavailable robots.txt -> no restrictions
-        elif resp.status_code >= 500:
+        elif resp.status_code >= 500 or 300 <= resp.status_code < 400:
             raise RagError(
                 ErrorCode.FETCH_FAILED,
                 f"robots.txt returned HTTP {resp.status_code}; treating the site as disallowed.",
@@ -135,6 +151,10 @@ class Crawler:
         attempt = 0
         hops = 0
         while True:
+            if not self.scope.contains(current)[0] or not self._robots_allows(current):
+                return self._result(url, current, None, 'scope_or_robots_disallowed', started, FetchOutcome.SKIPPED)
+            if self.check_network:
+                assert_public_host(urlsplit(current).hostname or "")
             await limiter.wait()
             try:
                 async with client.stream("GET", current, timeout=self.limits.timeout_s) as resp:
@@ -179,8 +199,12 @@ class Crawler:
                             return self._result(url, current, status, "too_large", started, FetchOutcome.SKIPPED, size)
                         chunks.append(part)
                     body = b"".join(chunks)
-                    encoding = resp.encoding or "utf-8"
-                    html = body.decode(encoding, errors="replace")
+                    # HTTP charset when declared; otherwise honor the HTML charset declaration.
+                    from bs4 import UnicodeDammit
+                    declared_encoding = resp.charset_encoding
+                    html = UnicodeDammit(body, known_definite_encodings=[declared_encoding] if declared_encoding else [], is_html=True).unicode_markup
+                    if html is None:
+                        return self._result(url, current, status, "decode_failed", started, FetchOutcome.FAILED)
                     result = self._result(url, current, status, "fetched", started, FetchOutcome.ACCEPTED, size)
                     result.html = html
                     return result
@@ -197,6 +221,10 @@ class Crawler:
         return FetchResult(url, final, status, None, outcome, reason, size, int((time.monotonic() - started) * 1000))
 
     # ------------------------------------------------------------------ crawl
+    async def _sitemap_links(self, client, limiter) -> list[str]:
+        from .sitemaps import discover
+        return await discover(self, client, limiter)
+
     async def run(self) -> CrawlResult:
         seed = normalize_url(self.site.seed_url)
         in_scope, why = self.scope.contains(seed)
@@ -215,6 +243,27 @@ class Crawler:
             client_kwargs["transport"] = self.transport
 
         result = CrawlResult(pages=[], log=[])
+        checkpoint = load_checkpoint(self.checkpoint_dir, self.site) if self.checkpoint_dir else None
+        if self.checkpoint_dir:
+            result.pages = DiskPages(self.checkpoint_dir / "pages", self.corpus_id)
+        if checkpoint:
+            result.log = [CrawlLogEntry.model_validate(e) for e in checkpoint['outcomes']]
+        elif self.legacy_dir:
+            # Import accepted pages and deferred URLs from a legacy snapshot, never refetch them.
+            for page in load_pages(self.legacy_dir):
+                result.pages.append(page.model_copy(update={"corpus_id": self.corpus_id}))
+            log_path = self.legacy_dir / 'crawl_log.jsonl'
+            result.log = [CrawlLogEntry.model_validate_json(x) for x in log_path.read_text(encoding='utf-8').splitlines() if x.strip()]
+
+        # Recover a durable page written just before a hard interruption of checkpoint commit.
+        logged = {e.url for e in result.log}
+        for page in result.pages:
+            if page.site_id != self.site.site_id or not self.scope.contains(page.final_url)[0]:
+                raise RagError(ErrorCode.INDEX_INCOMPATIBLE, 'Cached crawl page is outside selected site scope.', stage='crawl')
+            if page.requested_url not in logged:
+                result.log.append(CrawlLogEntry(url=page.requested_url, final_url=page.final_url,
+                                               outcome=FetchOutcome.ACCEPTED, reason='accepted', depth=page.depth))
+
         async with httpx.AsyncClient(**client_kwargs) as client:
             result.robots_url = await self._load_robots(client)
             if not self._robots_allows(seed):
@@ -231,34 +280,83 @@ class Crawler:
                     delay = max(delay, float(crawl_delay))
             limiter = _RateLimiter(delay)
 
-            frontier: deque[tuple[str, int]] = deque([(seed, 0)])
-            seen = {seed}
-            hashes: dict[str, str] = {}
+            # A deliberate scope expansion can make formerly blocked redirects eligible.
+            reopened = {e.url for e in result.log if e.reason == 'redirect_outside_path_prefix'
+                        and e.final_url and self.scope.contains(e.final_url)[0]}
+            pending = [(e.url, e.depth) for e in result.log if e.url in reopened or e.outcome in (FetchOutcome.FAILED, FetchOutcome.DEFERRED)
+                       or e.reason == 'not_fetched_limit_reached']
+            result.log = [e for e in result.log if e.outcome not in (FetchOutcome.FAILED, FetchOutcome.DEFERRED)
+                          and e.reason != 'not_fetched_limit_reached' and e.url not in reopened]
+            done = {e.url for e in result.log} | {p.requested_url for p in result.pages}
+            frontier = deque(tuple(x) for x in (checkpoint['frontier'] if checkpoint else []))
+            frontier.extend(pending)
+            for url in [seed, *self.site.seed_urls]:
+                url = normalize_url(url)
+                ok, why = self.scope.contains(url)
+                if not ok:
+                    raise RagError(ErrorCode.URL_REJECTED, f'Seed is outside scope: {why}', stage='crawl')
+                if url not in done:
+                    frontier.append((url, 0))
+            frontier = deque(dict.fromkeys((u, d) for u, d in frontier if u not in done))
+            depth_pending = [(u, d) for u, d in frontier if d > limits.max_depth]
+            frontier = deque((u, d) for u, d in frontier if d <= limits.max_depth)
+            for url, depth in depth_pending:
+                result.log.append(CrawlLogEntry(url=url, depth=depth, outcome=FetchOutcome.DEFERRED, reason='max_depth_reached'))
+            seen = set(checkpoint['seen'] if checkpoint else done) | {u for u, _ in frontier}
+            hashes = {p.content_hash: p.final_url for p in result.pages}
             deadline = time.monotonic() + limits.max_total_s
             max_fetches = limits.max_pages * 3
             fetches = 0
-
-            while frontier:
-                if len(result.pages) >= limits.max_pages:
-                    result.stopped_reason = "max_pages_reached"
-                    break
-                if time.monotonic() > deadline:
-                    result.stopped_reason = "time_budget_exhausted"
-                    break
-                if fetches >= max_fetches:
-                    result.stopped_reason = "fetch_budget_exhausted"
-                    break
-                batch = []
-                while frontier and len(batch) < limits.concurrency:
-                    batch.append(frontier.popleft())
-                fetches += len(batch)
-                fetched = await asyncio.gather(*(self._fetch(client, u, limiter) for u, _ in batch))
-                for (url, depth), fr in zip(batch, fetched):
-                    self._process(fr, depth, result, frontier, seen, hashes)
+            try:
+                for url in await asyncio.wait_for(self._sitemap_links(client, limiter), max(.01, deadline - time.monotonic())):
+                    if url not in seen:
+                        seen.add(url)
+                        frontier.append((url, 0))
+                while frontier:
                     if len(result.pages) >= limits.max_pages:
+                        result.stopped_reason = 'max_pages_reached'
                         break
+                    if time.monotonic() > deadline:
+                        result.stopped_reason = 'time_budget_exhausted'
+                        break
+                    if fetches >= max_fetches:
+                        result.stopped_reason = 'fetch_budget_exhausted'
+                        break
+                    # Never fetch more potential accepted pages than remaining capacity.
+                    size = min(limits.concurrency, limits.max_pages - len(result.pages), max_fetches - fetches)
+                    batch = list(islice(frontier, size))
+                    try:
+                        fetched = await asyncio.wait_for(
+                            asyncio.gather(*(self._fetch(client, u, limiter) for u, _ in batch)),
+                            max(.01, deadline - time.monotonic()))
+                    except TimeoutError:
+                        result.stopped_reason = 'time_budget_exhausted'
+                        break
+                    fetches += len(batch)
+                    for (url, depth), fr in zip(batch, fetched):
+                        if not self._robots_allows(url):
+                            fr = self._result(url, url, None, 'robots_disallowed', time.monotonic(), FetchOutcome.SKIPPED)
+                        self._process(fr, depth, result, frontier, seen, hashes)
+                        frontier.popleft()
+                        if self.checkpoint_dir:
+                            save_checkpoint(self.checkpoint_dir, self.site, result, frontier, seen)
+                if not frontier and any(e.outcome == FetchOutcome.FAILED for e in result.log):
+                    result.stopped_reason = 'frontier_exhausted_with_failures'
+                elif not frontier and any(e.outcome == FetchOutcome.DEFERRED for e in result.log):
+                    result.stopped_reason = 'max_depth_reached'
+                elif self.discovery_limited and result.stopped_reason == 'frontier_exhausted':
+                    result.stopped_reason = 'sitemap_discovery_limit'
+            except BaseException:
+                result.stopped_reason = 'interrupted'
+                raise
+            finally:
+                if self.checkpoint_dir:
+                    save_checkpoint(self.checkpoint_dir, self.site, result, frontier, seen)
+            result.pending = list(frontier)
+            result.pending.extend((e.url, e.depth) for e in result.log if e.outcome == FetchOutcome.DEFERRED)
             for url, depth in frontier:
-                result.log.append(CrawlLogEntry(url=url, outcome=FetchOutcome.SKIPPED, reason="not_fetched_limit_reached", depth=depth))
+                result.log.append(CrawlLogEntry(url=url, outcome=FetchOutcome.DEFERRED,
+                                               reason='not_fetched_limit_reached', depth=depth))
         return result
 
     def _process(self, fr: FetchResult, depth: int, result: CrawlResult, frontier, seen, hashes) -> None:  # noqa: ANN001
@@ -274,7 +372,7 @@ class Crawler:
         final_url = fr.final_url or fr.url
         page: ExtractedPage = extract_page(fr.html)
 
-        if not page.nofollow and depth < self.limits.max_depth:
+        if not page.nofollow:
             for href in page.links:
                 try:
                     link = normalize_url(href, base=final_url)
@@ -289,6 +387,9 @@ class Crawler:
                 if not self._robots_allows(link):
                     result.log.append(CrawlLogEntry(url=link, outcome=FetchOutcome.SKIPPED, reason="robots_disallowed", depth=depth + 1))
                     continue
+                if depth >= self.limits.max_depth:
+                    result.log.append(CrawlLogEntry(url=link, outcome=FetchOutcome.DEFERRED, reason='max_depth_reached', depth=depth + 1))
+                    continue
                 frontier.append((link, depth + 1))
 
         reason = None
@@ -299,7 +400,7 @@ class Crawler:
         chash = content_hash(page.sections)
         if reason is None and chash in hashes:
             reason = f"duplicate_of:{hashes[chash]}"
-        if final_url != fr.url and final_url in {p.final_url for p in result.pages}:
+        if final_url != fr.url and final_url in hashes.values():
             reason = "duplicate_final_url"
 
         if reason:
@@ -317,7 +418,12 @@ class Crawler:
             content_hash=chash, depth=depth, word_count=page.word_count, sections=page.sections,
         )
         result.pages.append(record)
-        result.raw_html[pid] = fr.html
+        if self.checkpoint_dir:
+            raw = self.checkpoint_dir / 'raw'
+            raw.mkdir(exist_ok=True)
+            (raw / f'{pid}.html.gz').write_bytes(gzip.compress(fr.html.encode('utf-8')))
+        else:
+            result.raw_html[pid] = fr.html
         entry.reason = "accepted"
         result.log.append(entry)
         self.progress("page", {"url": final_url, "outcome": "accepted", "title": page.title, "words": page.word_count, "accepted": len(result.pages)})

@@ -65,6 +65,7 @@ class Settings(BaseSettings):
     # Chunking (starting hypotheses, not tuned optima).
     chunk_target_tokens: int = Field(default=320, ge=50, le=1000)
     chunk_overlap_tokens: int = Field(default=48, ge=0, le=300)
+    max_index_chunks: int = Field(default=30000, ge=100, le=100000)
 
     # Spending guards for evaluation / batch runs.
     eval_max_requests: int = Field(default=60, ge=1)

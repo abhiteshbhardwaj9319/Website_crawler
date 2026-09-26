@@ -1,0 +1,9 @@
+{
+  "frozen_before_tuning": true,
+  "date": "2026-09-26",
+  "files": {
+    "questions_evolution_dev.jsonl": "2bdc88566a33ed04a189895bf1adf58cbb4815ef7fdb8e96140dd147e69a7f83",
+    "questions_holdout_v1.jsonl": "06f33a6d491358217d25907aeb90876c303b1f486688e99486e5e33a4edd2204"
+  },
+  "policy": "Select on development only. Holdout is one final comparison. Historical test already observed."
+}

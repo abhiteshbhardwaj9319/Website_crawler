@@ -67,6 +67,9 @@ class SiteRegistry:
                         description=entry.get("description", ""),
                         crawl=CrawlLimits(**entry.get("crawl", {})),
                         exclude_patterns=entry.get("exclude_patterns", []),
+                        additional_path_prefixes=entry.get('additional_path_prefixes', []),
+                        seed_urls=entry.get('seed_urls', []),
+                        sitemap_urls=entry.get('sitemap_urls', []),
                     )
                 )
                 data.next_number += 1

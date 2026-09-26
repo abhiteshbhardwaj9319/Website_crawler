@@ -1,0 +1,89 @@
+{
+  "scope": {
+    "host": "docs.scrapy.org",
+    "paths": [
+      "/en/2.19/"
+    ],
+    "seeds": [
+      "https://docs.scrapy.org/en/2.19/"
+    ],
+    "exclusions": [
+      "/news[.]html$"
+    ],
+    "sitemaps": [],
+    "version": 1
+  },
+  "scope_fingerprint": "827582e0e1761517",
+  "limits": {
+    "max_pages": 180,
+    "max_depth": 6,
+    "max_bytes_per_page": 3000000,
+    "timeout_s": 20.0,
+    "max_total_s": 600.0,
+    "delay_s": 0.5,
+    "concurrency": 2,
+    "max_retries": 2,
+    "min_page_words": 80,
+    "max_sitemaps": 8,
+    "max_sitemap_depth": 2,
+    "max_sitemap_urls": 3000
+  },
+  "discovery_sources": [
+    "HTML links",
+    "explicit seeds",
+    "bounded sitemaps"
+  ],
+  "accepted": 144,
+  "skipped": 5,
+  "failed": 0,
+  "pending": 0,
+  "discovered_in_scope": 149,
+  "reasons": {
+    "accepted": 144,
+    "low_content": 5
+  },
+  "processed_of_discovered": "149/149",
+  "crawl_complete": true,
+  "stop_reason": "frontier_exhausted",
+  "active_corpus": "scrapy-docs-2-19--20260926T002328-527e90",
+  "index_pages": 144,
+  "index_chunks": 1895,
+  "manifest": {
+    "corpus_id": "scrapy-docs-2-19--20260926T002328-527e90",
+    "site_id": "scrapy-docs-2-19",
+    "status": "complete",
+    "seed_url": "https://docs.scrapy.org/en/2.19/",
+    "allowed_host": "docs.scrapy.org",
+    "allowed_path_prefix": "/en/2.19/",
+    "collection_name": "corpus_scrapy-docs-2-19--20260926T002328-527e90",
+    "accepted_pages": 144,
+    "chunk_count": 1895,
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "embedding_dim": 384,
+    "chunker_version": "chunk-v1",
+    "extractor_version": "extract-v2",
+    "chunk_target_tokens": 320,
+    "chunk_overlap_tokens": 48,
+    "config_fingerprint": "e202e2376a0e3b2c",
+    "scope_fingerprint": "827582e0e1761517",
+    "scope": {
+      "host": "docs.scrapy.org",
+      "paths": [
+        "/en/2.19/"
+      ],
+      "seeds": [
+        "https://docs.scrapy.org/en/2.19/"
+      ],
+      "exclusions": [
+        "/news[.]html$"
+      ],
+      "sitemaps": [],
+      "version": 1
+    },
+    "started_at": "2026-09-26T00:23:29.431312Z",
+    "completed_at": "2026-09-26T00:27:38.562816Z",
+    "error": null
+  },
+  "chunks_sha256": "c21ec00b0b0859cdf38bcf5ffc70ea21ea6c239e5deab3c55e2d16da423047fc",
+  "input_source_urls": []
+}

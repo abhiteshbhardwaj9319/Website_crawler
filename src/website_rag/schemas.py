@@ -33,6 +33,9 @@ class CrawlLimits(BaseModel):
     concurrency: int = Field(default=2, ge=1, le=8)
     max_retries: int = Field(default=2, ge=0, le=5)
     min_page_words: int = Field(default=80, ge=0)
+    max_sitemaps: int = Field(default=8, ge=0, le=50)
+    max_sitemap_depth: int = Field(default=2, ge=0, le=5)
+    max_sitemap_urls: int = Field(default=3000, ge=1, le=10000)
 
 
 class SiteRecord(BaseModel):
@@ -42,6 +45,13 @@ class SiteRecord(BaseModel):
     seed_url: str
     allowed_host: str
     allowed_path_prefix: str
+    additional_path_prefixes: list[str] = Field(default_factory=list)
+    seed_urls: list[str] = Field(default_factory=list)
+    sitemap_urls: list[str] = Field(default_factory=list)
+    scope_version: int = 1
+    crawl_complete: bool = False
+    crawl_stop_reason: str | None = None
+    pending_urls: int = 0
     description: str = ""
     crawl: CrawlLimits = Field(default_factory=CrawlLimits)
     exclude_patterns: list[str] = Field(default_factory=list)
@@ -67,6 +77,7 @@ class FetchOutcome(StrEnum):
     ACCEPTED = "accepted"
     SKIPPED = "skipped"
     FAILED = "failed"
+    DEFERRED = "deferred"
 
 
 class Section(BaseModel):
@@ -151,6 +162,8 @@ class IndexManifest(BaseModel):
     chunk_target_tokens: int
     chunk_overlap_tokens: int
     config_fingerprint: str
+    scope_fingerprint: str = "legacy"
+    scope: dict = Field(default_factory=dict)
     started_at: datetime = Field(default_factory=utcnow)
     completed_at: datetime | None = None
     error: str | None = None

@@ -1,0 +1,96 @@
+{
+  "scope": {
+    "host": "docs.python.org",
+    "paths": [
+      "/3.13/tutorial/",
+      "/3.13/library/",
+      "/3.13/builtins/"
+    ],
+    "seeds": [
+      "https://docs.python.org/3.13/tutorial/",
+      "https://docs.python.org/3.13/library/functions.html",
+      "https://docs.python.org/3.13/library/"
+    ],
+    "exclusions": [],
+    "sitemaps": [],
+    "version": 3
+  },
+  "scope_fingerprint": "fec7327f81b1f777",
+  "limits": {
+    "max_pages": 90,
+    "max_depth": 3,
+    "max_bytes_per_page": 3000000,
+    "timeout_s": 20.0,
+    "max_total_s": 600.0,
+    "delay_s": 0.5,
+    "concurrency": 2,
+    "max_retries": 2,
+    "min_page_words": 80,
+    "max_sitemaps": 8,
+    "max_sitemap_depth": 2,
+    "max_sitemap_urls": 3000
+  },
+  "discovery_sources": [
+    "HTML links",
+    "explicit seeds",
+    "bounded sitemaps"
+  ],
+  "accepted": 90,
+  "skipped": 8,
+  "failed": 0,
+  "pending": 186,
+  "discovered_in_scope": 284,
+  "reasons": {
+    "accepted": 90,
+    "duplicate_content": 1,
+    "low_content": 7
+  },
+  "processed_of_discovered": "98/284",
+  "crawl_complete": false,
+  "stop_reason": "max_pages_reached",
+  "active_corpus": "python-tutorial-3-13--20260926T002925-aba199",
+  "index_pages": 90,
+  "index_chunks": 4611,
+  "manifest": {
+    "corpus_id": "python-tutorial-3-13--20260926T002925-aba199",
+    "site_id": "python-tutorial-3-13",
+    "status": "complete",
+    "seed_url": "https://docs.python.org/3.13/tutorial/",
+    "allowed_host": "docs.python.org",
+    "allowed_path_prefix": "/3.13/tutorial/",
+    "collection_name": "corpus_python-tutorial-3-13--20260926T002925-aba199",
+    "accepted_pages": 90,
+    "chunk_count": 4611,
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "embedding_dim": 384,
+    "chunker_version": "chunk-v1",
+    "extractor_version": "extract-v2",
+    "chunk_target_tokens": 320,
+    "chunk_overlap_tokens": 48,
+    "config_fingerprint": "e202e2376a0e3b2c",
+    "scope_fingerprint": "fec7327f81b1f777",
+    "scope": {
+      "host": "docs.python.org",
+      "paths": [
+        "/3.13/tutorial/",
+        "/3.13/library/",
+        "/3.13/builtins/"
+      ],
+      "seeds": [
+        "https://docs.python.org/3.13/tutorial/",
+        "https://docs.python.org/3.13/library/functions.html",
+        "https://docs.python.org/3.13/library/"
+      ],
+      "exclusions": [],
+      "sitemaps": [],
+      "version": 3
+    },
+    "started_at": "2026-09-26T00:29:26.123006Z",
+    "completed_at": "2026-09-26T00:42:01.174488Z",
+    "error": null
+  },
+  "chunks_sha256": "a2606bfaaad3183c001b6cb82aa1055f16c3f93d37f47ef2550d2263e1e5e9c8",
+  "input_source_urls": [
+    "https://docs.python.org/3.13/builtins/functions.html#input"
+  ]
+}

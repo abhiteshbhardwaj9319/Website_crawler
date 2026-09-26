@@ -1,0 +1,51 @@
+{
+  "run_id": "r-d42f8f5b5d654b9f",
+  "question": "what is python command to get input",
+  "site_id": "python-tutorial-3-13",
+  "corpus_id": "python-tutorial-3-13--20260926T002925-aba199",
+  "status": "answered",
+  "answer": "The Python command to get input from the user is `input(prompt, /)`, where the prompt argument is optional and, if present, is written to standard output without a trailing newline. The function then reads a line from input, converts it to a string (stripping a trailing newline), and returns that string. [1][2]",
+  "claims": [
+    {
+      "text": "The Python command to get input from the user is `input(prompt, /)`, where the prompt argument is optional and, if present, is written to standard output without a trailing newline. The function then reads a line from input, converts it to a string (stripping a trailing newline), and returns that string.",
+      "citations": [
+        1,
+        2
+      ]
+    }
+  ],
+  "citations": [
+    {
+      "marker": 1,
+      "chunk_id": "819307aa723290c677c20e44",
+      "quote": "input(prompt, /)",
+      "url": "https://docs.python.org/3.13/builtins/functions.html#input",
+      "title": "Built-in Functions",
+      "section": "Built-in Functions > input()"
+    },
+    {
+      "marker": 2,
+      "chunk_id": "819307aa723290c677c20e44",
+      "quote": "If the prompt argument is present, it is written to standard output without a trailing newline. The function then reads a line from input, converts it to a string (stripping a trailing newline), and returns that. When EOF is read, EOFError is raised. Example:",
+      "url": "https://docs.python.org/3.13/builtins/functions.html#input",
+      "title": "Built-in Functions",
+      "section": "Built-in Functions > input()"
+    }
+  ],
+  "usage": {
+    "attempts": 1,
+    "errors": 0,
+    "input_tokens": 4293,
+    "cached_input_tokens": 0,
+    "output_tokens": 137,
+    "reasoning_tokens": 0,
+    "cost_usd": 0.0019364,
+    "unknown_cost_events": 0,
+    "local_embedding_tokens": 7,
+    "accounting_write_failures": 0
+  },
+  "latency_ms": 8585,
+  "prompt_version": "answer_v2",
+  "provider": "openai",
+  "model": "gpt-4.1-mini-2025-04-14"
+}
