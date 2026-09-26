@@ -1,0 +1,60 @@
+[
+  {
+    "provider": "openai",
+    "requests": 35,
+    "input_tokens": 151749,
+    "output_tokens": 5929,
+    "cached_input_tokens": 0,
+    "reasoning_tokens": 0,
+    "known_cost_usd": 0.070186,
+    "mean_cost_usd": 0.002005314285714286,
+    "mean_input_tokens": 4335.685714285714,
+    "mean_output_tokens": 169.4,
+    "mean_latency_ms": 3771,
+    "projections_usd": {
+      "100": 0.20053142857142858,
+      "1000": 2.005314285714286,
+      "10000": 20.05314285714286
+    },
+    "stage_mean_ms": {
+      "validate": 1.1428571428571428,
+      "retrieve": 1793.2857142857142,
+      "context": 0.05714285714285714,
+      "generate": 1949.6571428571428,
+      "check_citations": 0.7142857142857143,
+      "finalize": 0,
+      "query": 3771.8571428571427
+    },
+    "render_mean_ms": 1.85,
+    "provider_attempt_mean_ms": 1946.2
+  },
+  {
+    "provider": "groq",
+    "requests": 3,
+    "input_tokens": 13782,
+    "output_tokens": 452,
+    "cached_input_tokens": 0,
+    "reasoning_tokens": 127,
+    "known_cost_usd": 0.0023385,
+    "mean_cost_usd": 0.0007794999999999999,
+    "mean_input_tokens": 4594,
+    "mean_output_tokens": 150.66666666666666,
+    "mean_latency_ms": 3939.3333333333335,
+    "projections_usd": {
+      "100": 0.07794999999999999,
+      "1000": 0.7795,
+      "10000": 7.794999999999999
+    },
+    "stage_mean_ms": {
+      "validate": 0.6666666666666666,
+      "retrieve": 1580.6666666666667,
+      "context": 0,
+      "generate": 2324.3333333333335,
+      "check_citations": 1,
+      "finalize": 0,
+      "query": 3940.3333333333335
+    },
+    "render_mean_ms": 1.2033333333333334,
+    "provider_attempt_mean_ms": 2320.6666666666665
+  }
+]

@@ -20,6 +20,8 @@ def main():
     s = Settings()
     reg = SiteRegistry(s.registry_path)
     out = Path('eval/results/evolution-baseline')
+    if (out / 'fingerprints.json').exists():
+        raise SystemExit('Frozen baseline exists. Use a separately versioned capture; never overwrite it.')
     out.mkdir(parents=True, exist_ok=True)
     local = Path('artifacts/evolution')
     local.mkdir(parents=True, exist_ok=True)

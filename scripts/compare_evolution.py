@@ -14,10 +14,12 @@ from website_rag.registry import SiteRegistry
 from website_rag.retrieve import Retriever, select_context
 
 
-def run(split: str, holdout: bool = False):
+def run(split: str, holdout: bool = False, output: str = 'eval/results/evolution-retrieval'):
     s = Settings()
     reg = SiteRegistry(s.registry_path)
-    out = Path('eval/results/evolution-retrieval')
+    out = Path(output)
+    if (out / f'{split}-summary.json').exists():
+        raise SystemExit('Frozen experiment exists. Use a separately versioned output; never overwrite it.')
     out.mkdir(parents=True, exist_ok=True)
     cases = load_questions(split)
     variants = [('dense20', 'dense', 20, 20, 'ranked'), ('bm2520', 'bm25', 20, 20, 'ranked'),
@@ -28,7 +30,7 @@ def run(split: str, holdout: bool = False):
                      ('hybrid_diverse', 'hybrid', 20, 20, 'diverse'),
                      ('hybrid_neighbors', 'hybrid', 20, 20, 'neighbors')]
     else:
-        selection = json.loads((out/'selection.json').read_text())
+        selection = json.loads(Path('eval/results/evolution-retrieval/selection.json').read_text(encoding='utf-8'))
         v = tuple(selection['variant'])
         if v not in variants:
             variants.append(v)
@@ -82,5 +84,6 @@ def run(split: str, holdout: bool = False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--holdout', action='store_true')
+    parser.add_argument('--out', default='eval/results/evolution-retrieval', help='Use a new directory for a repeat experiment.')
     args = parser.parse_args()
-    run('holdout_v1' if args.holdout else 'evolution_dev', args.holdout)
+    run('holdout_v1' if args.holdout else 'evolution_dev', args.holdout, args.out)

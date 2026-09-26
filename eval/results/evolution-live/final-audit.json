@@ -1,0 +1,85 @@
+{
+  "date": "2026-09-26",
+  "markdown_links_checked": 82,
+  "markdown_errors": [],
+  "evaluation_json": "parsed successfully",
+  "live_cases": 38,
+  "foreign_citation_hosts": 0,
+  "foreign_retrieved_corpora": 0,
+  "semantic_review_hash": "matches LF answer bytes",
+  "original_corpora_preserved": [
+    {
+      "corpus_id": "scrapy-docs-2-19--20260925T233638-a193f0",
+      "chunks_sha256_matches_baseline": true,
+      "manifest_and_vector_count_verified": true,
+      "chunk_count": 945
+    },
+    {
+      "corpus_id": "python-tutorial-3-13--20260925T224632",
+      "chunks_sha256_matches_baseline": true,
+      "manifest_and_vector_count_verified": true,
+      "chunk_count": 251
+    }
+  ],
+  "active_corpora": [
+    {
+      "site": 1,
+      "corpus_id": "scrapy-docs-2-19--20260926T002328-527e90",
+      "pages": 144,
+      "chunks": 1895,
+      "verified_ready": true
+    },
+    {
+      "site": 2,
+      "corpus_id": "python-tutorial-3-13--20260926T002925-aba199",
+      "pages": 90,
+      "chunks": 4611,
+      "verified_ready": true
+    }
+  ],
+  "offline_tests": {
+    "command": ".venv/Scripts/python.exe -m pytest -o addopts= -q",
+    "exit_code": 0,
+    "passed": 106,
+    "skipped_live": 3,
+    "seconds": 53.61
+  },
+  "final_sitemap_regressions": {
+    "passed": 11,
+    "seconds": 11.0
+  },
+  "capture_overwrite_guards": "Both existing baseline and experiment rejected before data/model/provider operations",
+  "code_sha256_lf": {
+    "src/website_rag/checkpoint.py": "5dd46c094d508b0360fb445d23053dbd24bbf43ed2e40efe05843b8ab0c92ccc",
+    "src/website_rag/chunk.py": "e977ff2dcf79b9aeb5384ed6337346845af7a14f759c24129ae444eb72c1c9cf",
+    "src/website_rag/citations.py": "ad2445d475d6a2b15baa8b67c1d9eab33509329d6c4472ac93ca4a84da54988a",
+    "src/website_rag/cli.py": "7b0e5b99c6a75ea0dec4736bd8ced6510c0598ac27f69522bcd03a2230202877",
+    "src/website_rag/config.py": "07e646e5a74e7a143cc3aa2f3db0d7004273360f562af7a039b791fa657a98b8",
+    "src/website_rag/crawl.py": "9f6a8e0b739228213e4759cd08159a901feef82f30fe6bd13a3e8d18aba84ba2",
+    "src/website_rag/embeddings.py": "ed48a4e42b83ff5e86ff580ea0a40293f256e53c784ad4f357d246aa0594880e",
+    "src/website_rag/errors.py": "e7ece2bab026f652ef128c9fb687a6204356ad035aeeec836fc3dd06b1fcba87",
+    "src/website_rag/evaluate.py": "076c01410d8e3ec58475c5a1127db1c0fed419fbe754c560771b0844c18728fc",
+    "src/website_rag/evidence.py": "e08884c176b7fcdb7b7c37be1984f89d20e24e1d9bcf55ddf00806b452354fc3",
+    "src/website_rag/extract.py": "a33c174d9f95cbc7899c1e249ab2cb8839bbc4d3d90d2585037fe0c9667cb0f5",
+    "src/website_rag/generate.py": "d9cf940396000e789314dc45094ad5fb6853af67511761f2d378c26832a975eb",
+    "src/website_rag/graph.py": "42767075ba4cc31d1be6b4b8cbc7231745615333ff5be43417372e0fd38ac81f",
+    "src/website_rag/index.py": "2568402f6f44ea7fb4cde9ad308dee9d783db66b228693f9ccb5fe4b161f8a08",
+    "src/website_rag/ingest.py": "242b8a4b109cc93ce6d9c1df868cae86b062fc5755c60e69fdbe9efe270ad8b8",
+    "src/website_rag/providers.py": "18429702bdc99c58b0916983da0240a5d5c998dba100443a4b43b2bc7c9ae8f9",
+    "src/website_rag/registry.py": "056ca6ca6b896c63cc82a6935e64471d880095c78c642c598da3d39d930b1407",
+    "src/website_rag/render.py": "135e45f7f729a6c2f41010afb026ef0ba024e71a7f2d10d216e60dd98b0a97b9",
+    "src/website_rag/retrieve.py": "6e119cfbaa621c8232d3f0d44e885752b8530b1e6b2962e52a29f8642118f13b",
+    "src/website_rag/schemas.py": "042e8b321e9bf6a5192196bc7651e300cfd43fd693d64c166ac315ec75794ae0",
+    "src/website_rag/sitemaps.py": "84500a2d94326f8ec7323fa3cdc8609630c3c1974042b48dde169a0c58b26829",
+    "src/website_rag/tracing.py": "688eb721c34c2ce9d96f48dc7fff6e6cdb576522a9e5873bc439d6b5826e370c",
+    "src/website_rag/urls.py": "7f5f47b855fce1ffd96dd360d77832232b9ed3e8e91e3f0663b6d4713c255bae",
+    "src/website_rag/usage.py": "087537d709f7beda5f5533eb9f46caaa2b026735d322d56db6398e57836b58bd",
+    "src/website_rag/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "active_content_fingerprints": "Match final live run",
+  "final_cli_regressions": {
+    "passed": 13,
+    "seconds": 4.22
+  },
+  "shareable_diagrams": "No private workspace/user paths found; Git blob hashes match delivery receipts"
+}

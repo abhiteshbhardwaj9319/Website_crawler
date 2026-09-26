@@ -78,7 +78,8 @@ def site_banner(site: SiteRecord) -> Text:
     t.append("  ")
     t.append(clean(site.display_name), style="cyan")
     t.append(f"  ({site.accepted_pages} pages, {site.chunk_count} chunks indexed from ", style="dim")
-    t.append(clean(f"{site.allowed_host}{site.allowed_path_prefix}"), style="dim")
+    paths = ', '.join([site.allowed_path_prefix, *site.additional_path_prefixes])
+    t.append(clean(f"{site.allowed_host} {paths}"), style="dim")
     t.append(")", style="dim")
     return t
 

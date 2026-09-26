@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-26",
+  "python": "Python 3.11.7",
+  "install": "uv sync --locked --project artifacts/evolution/clean-setup",
+  "install_exit_code": 0,
+  "lock_sha256": "6f1ef8d86632262d8320b171fbc9777f4d857b7d82f7286346b28744e2901986",
+  "credentials": "No .env copied; provider and RAG environment settings removed from subprocesses",
+  "data": "New isolated registry; existing indexes untouched",
+  "checks": [
+    {
+      "command": [
+        "doctor",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": "pass"
+    },
+    {
+      "command": [
+        "sites",
+        "list",
+        "--json"
+      ],
+      "exit_code": 0,
+      "result": "pass"
+    },
+    {
+      "command": [
+        "ask",
+        "What is a spider?",
+        "--json"
+      ],
+      "exit_code": 2,
+      "result": "pass"
+    },
+    {
+      "command": [
+        "demo",
+        "--help"
+      ],
+      "exit_code": 0,
+      "result": "pass"
+    }
+  ],
+  "limitations": "Fresh install and CLI bootstrap only; no second live crawl/provider run in this environment."
+}

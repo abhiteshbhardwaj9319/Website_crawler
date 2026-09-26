@@ -32,7 +32,39 @@ Chunk headings, titles, identifiers and definition anchors are preserved. The ev
 
 ## Live answer acceptance
 
-The bounded final run and semantic review are recorded in the final acceptance checkpoint. Citation identity, factual support and answer completeness are separate metrics. An answered status or a matching source passage alone is not proof of a correct answer.
+The [38-case final run](../eval/results/evolution-live/answers.jsonl), [summaries](../eval/results/evolution-live/summary.json), [fingerprints](../eval/results/evolution-live/fingerprints.json) and [claim review](../eval/results/evolution-live/semantic-review.json) preserve the evidence. It used 35 explicit OpenAI requests and three independent Groq requests, one attempt each, no fallback. A 40-request/$0.15 known-spend stopping cap bounded the run; recorded cost was $0.0725245. There were **0/38 operational errors**, **0 unknown usage events** and **0/38 site/corpus leaks** in retrieved chunks; cited URLs were also checked against their selected hosts.
+
+| Suite | Cases | Structural behavior proxy | Correct abstentions | Accepted/generated claims | Gold groups cited |
+| --- | --- | --- | --- | --- | --- |
+| New holdout, OpenAI | 12 | 11/12 | 4/4 | 12/12 | 7/10 |
+| Observed original test, OpenAI | 15 | 13/15 | 3/3 | 27/27 | 16/21 |
+| Isolation, OpenAI | 5 | 5/5 | 4/4 | 2/3 | 1/1 |
+| Three user questions, OpenAI | 3 | 3/3 | n/a | 7/7 | No gold labels |
+| Independent Groq smoke cases | 3 | 3/3 | 1/1 | 2/2 | No gold labels |
+
+The behavior proxy accepts answered/partial statuses and checks gold citation for false-premise cases; it does **not** measure semantic correctness or completeness. All 12 labeled abstentions succeeded. Two additional false-premise cases wrongly abstained. One generated claim was rejected for a passage ID not supplied for its chunk (isolation I05), leaving a partial answer with an accurate citation-failure notice. All 50 accepted claims had structurally valid source links; that does not establish meaning.
+
+**Explicit semantic review:** Codex compared every displayed claim with its selected quotations, then checked every requested answer part. This is a documented reviewer process, not an independent human review or a runtime entailment guarantee. **45/50 accepted claims were fully supported; 20/26 answerable cases were complete; 18/26 were both complete and fully source-supported.** The remaining 12 cases were expected abstentions. A strict rubric counts a multi-assertion claim as unsupported if any substantive part exceeds its selected excerpts.
+
+Five support failures remain visible in the review: H03 adds command-line precedence without citing that rule; H09 substitutes `getrandbits()` (one integer) for an integer sequence; T10 accepts the wrong new-project delay premise; T12's universal no-guarantee assertion exceeds its mitigation excerpts; Groq U03 cites `input()` signatures but omits the passage establishing user input. The source needed for Groq U03 was retrieved, so that is evidence selection rather than coverage. Incomplete cases include H03's missing cookies half, H09's missing arithmetic sequence, H04/T11 false-premise abstentions, T10's incorrect correction, and I05's withheld command plus dangling “this command” reference. These are measured limitations, not hidden successful outcomes. No prompt retuning on this observed holdout was performed.
+
+Original test labels are retained against the expanded corpus: its context recall is 16/21 versus historical rerank 17/21. Coverage and strict quote normalization both changed, so that is not an isolated ranker regression estimate. The original release-notes exclusion remains unchanged; no label was revised to manufacture improvement.
+
+## User-query before/after
+
+| Question | Original corpus / answer_v1 | Expanded corpus / answer_v2 |
+| --- | --- | --- |
+| New Scrapy project command | Answered; 2,592 in / 251 out; $0.0014384; 8,422 ms | Answered; 4,451 / 185; $0.0020764; 3,554 ms |
+| What is Python | Partial; 3 accepted + 1 rejected; 3,534 / 632; $0.0024248; 6,204 ms | Answered; 5 accepted; 4,703 / 427; $0.0025644; 4,930 ms |
+| Python command to get input | Insufficient evidence; 3,385 / 40; $0.001418; 1,645 ms | Answered from `builtins/functions.html#input`; 4,609 / 124; $0.002042; 3,034 ms |
+
+The project question is a closely related paraphrase, not byte-identical. Each row compares one observation; corpus, retrieval, prompt and provider latency changed. Input costs increased; fewer output tokens do not by themselves mean a cheaper answer. Scope expansion fixed the input coverage gap. No guaranteed speedup or aggregate pre/post semantic improvement is claimed.
+
+Mean live OpenAI stage times: retrieve 1,793 ms, context 0.06 ms, generation 1,950 ms (provider attempt 1,946 ms), citation checks 0.71 ms, render 1.85 ms; total 3,771 ms. Groq's three smoke cases averaged 3,939 ms total, including 2,321 ms provider attempts. Trace durations are integer milliseconds, so sub-ms stages can report zero. Rendering was measured separately and is not included in saved query latency.
+
+## Verification and rehearsal
+
+Final offline suite: **106 passed, 3 opt-in live tests skipped**. The explicit 38-request acceptance script supplies live evidence separately. Tests cover the free-text bypass, altered/foreign evidence, partial/all-invalid output, interruption recovery, scope expansion, sitemap constraints, failed refresh preservation, bounded batches, context policies and UI/JSON behavior. [24 CLI rehearsal checks](../eval/results/evolution-live/cli-rehearsal.json) exercised actual saved answers at 80/100/140 columns, PowerShell UTF-8 pipes, NO_COLOR/--no-color, ASCII borders, sources, traces, coverage, replay and error JSON. Windows Terminal GUI appearance was not opened or claimed. [Clean locked installation](../eval/results/evolution-live/clean-setup.json) passed four CLI/bootstrap checks on Python 3.11.7 with credentials removed and a separate registry; it did not repeat the live crawl or model evaluation. Both Archify diagrams have separately recorded [browser validation and visual review](diagrams/README.md).
 
 ## Reproduction
 
@@ -42,4 +74,4 @@ uv run rag evaluate --split holdout_v1 --modes hybrid_rerank --provider openai -
 uv run pytest
 ```
 
-Do not run two processes against the same local Qdrant store. Paid evaluation uses configured request/spend stopping caps; a call already in flight can take known spend past the threshold. Use a new output directory and retain original evidence. `scripts/compare_evolution.py` reproduces the original ablation layout; archive its output separately before rerunning because it writes deterministic filenames.
+Do not run two processes against the same local Qdrant store. Paid evaluation uses configured request/spend stopping caps; a call already in flight can take known spend past the threshold. Use a new output directory and retain original evidence. `scripts/compare_evolution.py --out artifacts/new-experiment` reproduces the original development ablation layout; `--holdout` evaluates the frozen selection. Capture scripts refuse to overwrite completed frozen experiments.

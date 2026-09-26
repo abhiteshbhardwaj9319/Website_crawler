@@ -83,6 +83,48 @@ def test_reference_definition_keeps_real_anchor():
         ('input', 'input(prompt)\n\nRead a line from input.'), ('len', 'len(object)\n\nReturn the length.')]
 
 
+@pytest.mark.parametrize('bound', ['depth', 'count'])
+def test_nested_sitemap_bound_never_claims_complete(tmp_path, bound):
+    calls = []
+    def handler(req):
+        calls.append(req.url.path)
+        if req.url.path == '/robots.txt':
+            return httpx.Response(404)
+        if req.url.path.endswith('.xml'):
+            return httpx.Response(200, text='<sitemapindex><sitemap><loc>https://docs.example.com/docs/nested.xml</loc></sitemap></sitemapindex>')
+        return httpx.Response(200, html=page('Home', f'<p>{LOREM}</p>'))
+    site = make_site(max_pages=10)
+    site.sitemap_urls = ['https://docs.example.com/docs/sitemap.xml']
+    if bound == 'depth':
+        site.crawl.max_sitemap_depth = 0
+    else:
+        site.crawl.max_sitemaps = 1
+    crawl_site(site, 'one', transport=httpx.MockTransport(handler), check_network=False, checkpoint_dir=tmp_path)
+    assert '/docs/nested.xml' not in calls
+    assert coverage(tmp_path)['stop_reason'] == 'sitemap_discovery_limit'
+    assert not coverage(tmp_path)['crawl_complete']
+
+
+def test_sitemap_http_failure_is_not_successful_discovery(tmp_path):
+    def handler(req):
+        return httpx.Response(503 if req.url.path.endswith('.xml') else 404)
+    site = make_site(max_pages=10)
+    site.sitemap_urls = ['https://docs.example.com/docs/sitemap.xml']
+    with pytest.raises(RagError, match='Sitemap returned HTTP 503'):
+        crawl_site(site, 'one', transport=httpx.MockTransport(handler), check_network=False, checkpoint_dir=tmp_path)
+    assert not coverage(tmp_path)['crawl_complete']
+
+
+def test_utf16_sitemap_dtd_is_rejected():
+    body = '<?xml version="1.0" encoding="UTF-16"?><!DOCTYPE urlset [<!ENTITY hidden "x">]><urlset>&hidden;</urlset>'
+    def handler(req):
+        return httpx.Response(200, content=body.encode('utf-16')) if req.url.path.endswith('.xml') else httpx.Response(404)
+    site = make_site(max_pages=10)
+    site.sitemap_urls = ['https://docs.example.com/docs/sitemap.xml']
+    with pytest.raises(RagError, match='DTD/entities'):
+        crawl_site(site, 'one', transport=httpx.MockTransport(handler), check_network=False)
+
+
 def test_scope_expansion_retries_blocked_redirect(tmp_path):
     def handler(req):
         if req.url.path == '/robots.txt':

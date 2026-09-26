@@ -1,93 +1,62 @@
-# Walkthrough script (10-15 minutes)
+# Walkthrough: 10–15 minutes
 
-Recording and submission are done by the author. **Video link: pending (not yet recorded).**
+The CLI sequence was rehearsed against actual saved runs at 80/100/140 columns, with live requests exercised in the acceptance run. A separate clean locked install passed bootstrap checks. This is a technical rehearsal, not a recorded or timed narration. **User video recording and submission remain pending.** Windows PowerShell/piped output was checked; a Windows Terminal GUI session was not opened.
 
-Before recording: `uv run rag doctor` shows both keys configured and sites 1 and 2 ready. Use a terminal at least 120 columns wide. Close other `rag` processes (local Qdrant allows one process). Pre-ingest sites 1 and 2; the live "add a URL" step uses a small site so it finishes in about a minute.
+Before presenting, close other `rag` processes, run `uv run rag doctor`, and use about 100–140 terminal columns. Existing corpora can be reused. Public clones must ingest first. Do not expose `.env` or manufacture a billing failure by editing credentials.
 
-## 0:00-1:30 Problem and scope
+## 0:00–3:00 Architecture and evidence boundary
 
-- Goal: answer questions about a website using only that website's pages, with source URLs, and say clearly when the pages do not contain the answer.
-- What I built: a Python CLI. Numbered websites, each with its own isolated index; hybrid retrieval; a small LangGraph workflow; verified citations; typed provider errors with a visible OpenAI to Groq fallback; local traces and cost accounting; a frozen evaluation set.
-- Out of scope on purpose: web UI, deployment, agent loops.
+Open [implemented architecture](diagrams/implemented-architecture.html) locally in a browser; use the [PNG fallback](diagrams/implemented-architecture.visual-check.2048x1320.light.png) on GitHub. Explain numbered sites, separate Qdrant/BM25 corpora, bounded crawl checkpoints and atomic activation. Show [question workflow](diagrams/evidence-path.html): context selection, provider call, deterministic passage checks and explicit abstention/error branches. These are static explanations, not live telemetry. LangGraph makes routing inspectable; it is not an accuracy guarantee.
 
-## 1:30-4:00 Architecture
+## 3:00–7:00 Live questions and sources
 
-Show [docs/diagrams/architecture-overview.svg](diagrams/architecture-overview.svg).
-
-- Ingestion: bounded, robots-aware crawler with scope and redirect checks, extractor that keeps headings, real anchors, and code; section-aware chunks; local bge-small embeddings (no API dependency for indexing or retrieval).
-- Isolation: one Qdrant collection + BM25 index + manifest per site version; a query opens exactly one; payloads are re-validated; citations must reference chunks sent in this run. Not enforced by prompt.
-- Query graph: validate, retrieve, context, generate, check citations, finalize; abstain without a model call when nothing is retrieved; every failure is a typed error with a next step.
-- Why LangGraph: explicit, testable routing and traceable state, not accuracy by itself.
-
-## 4:00-7:30 Live demo
-
-```bash
+```powershell
 uv run rag sites list
-uv run rag ask "Which command creates a new Scrapy project?" --site 1
+uv run rag demo project --provider openai
+uv run rag demo input --provider openai
+uv run rag sources <run-id-from-input-answer>
+uv run rag trace <run-id-from-input-answer>
 ```
-Point out: status, answer, verified claims with markers, sources with URL#anchor, section and exact quote, provider/model, tokens, cost, run ID.
 
-```bash
-uv run rag ask "If I enable AutoThrottle, can it ever use a delay shorter than DOWNLOAD_DELAY, and what DOWNLOAD_DELAY does a project created with startproject use by default?" --site 1 --show-retrieval
+Explain the single answer, inline markers and deduplicated source URLs, then inspect exact passages behind the compact view. Point out actual provider, tokens, cost and run ID. Python's source is now `https://docs.python.org/3.13/builtins/functions.html#input` after an official redirect; no answer is hard-coded.
+
+If live access is unavailable, explicitly use a recorded replay from this workspace:
+
+```powershell
+uv run rag demo --replay r-002102cc0ef246bd
+uv run rag demo --replay r-e82762d31b534721
 ```
-Multi-page: sources from `autothrottle.html` and `settings.html`; show ranks from dense and BM25 in the retrieval table.
 
-```bash
-uv run rag ask "Why does Scrapy set DOWNLOAD_DELAY to 0 by default, even in new projects created with startproject?" --site 1
-```
-False premise: the 2.19 docs say default 1 (fallback 0). Note that a model answering from memory would likely say 0.
+The replay prints its timestamp, corpus, model and run ID. These IDs are local artifacts, not files included in a public clone. Portable reviewed evidence is [here](../eval/results/evolution-live/answers.jsonl).
 
-```bash
-uv run rag ask "How much does a Zyte Scrapy Cloud subscription cost per month?" --site 1
-```
-Unanswerable: "The indexed pages for Scrapy 2.19 documentation do not contain enough information..." The wording is about the indexed pages, not the whole internet.
+## 7:00–9:00 Isolation, abstention and coverage
 
-Switch sites in chat:
-```bash
+```powershell
+uv run rag demo isolation --provider openai
+uv run rag demo abstain --provider openai
+uv run rag sites coverage 1
+uv run rag sites coverage 2
 uv run rag chat
-ask> How do I enable an item pipeline component?      # answered on site 1
-ask> 2                                                  # switch to Python tutorial; evidence cleared
-ask> How do I enable an item pipeline component?      # abstains; no Scrapy sources
-ask> How do I create a virtual environment?           # answered from venv.html
 ```
 
-Add a site (about a minute):
-```bash
-uv run rag sites add https://packaging.python.org/en/latest/tutorials/ --max-pages 8 --max-depth 1
-uv run rag ask "How do I create a pyproject.toml for a package?" --site 3
-uv run rag sites add https://example.com/        # low-content site fails clearly, with a trace ID
+In chat, enter `2`, then `/help`, then `/quit`. Site changes clear prior evidence. The isolation preset asks a Scrapy pipeline question while site 2 is selected; its recorded acceptance case abstained without Scrapy citations. The annual-profit preset also abstained. Live model responses may vary.
+
+Coverage: Scrapy 45 → 144 pages with zero pending; Python 17 → 90 with 186 pending at the cap. Show the scope and stop reason. Explain that raising the cap and `--resume` continues durable work, while `--refresh` fetches a new snapshot. Avoid a long crawl during the timed demo. The interrupted-resume and failed-refresh tests demonstrate recovery without deliberately breaking the working index.
+
+## 9:00–11:30 Results and an honest failure
+
+Show [evaluation](evaluation.md). Reranking recovered 19/19 development groups but only 7/10 holdout groups; hybrid got 8/10 much faster. The holdout did not confirm a universal gain. Cite 106 offline tests, 38 live calls and zero observed cross-site leakage.
+
+Show the review of H09 (`getrandbits` is one integer, not a sequence) or T10 (false delay premise). A valid passage ID does not prove entailment. Of 50 displayed claims, 45 were fully supported by their selected excerpts; 18/26 answerable cases were complete and fully grounded. Explain the difference between citation identity, support and completeness. Do not demonstrate T10 as a reliably corrected premise; the recorded answer failed it.
+
+For partial withholding, the recorded I05 run `r-23e7d64f9f564af6` rejected one command claim for an invalid passage ID. Normal replay shows the useful remainder plus the citation-failure notice; `rag sources` exposes explicitly marked diagnostics. Its remaining dangling reference is documented as a limitation.
+
+## 11:30–13:30 Costs and close
+
+```powershell
+uv run rag costs
 ```
 
-## 7:30-9:00 Errors and traces
+Show [cost analysis](cost-analysis.md): local ingestion has no API charge; final acceptance cost $0.0725245 at list prices. OpenAI's observed mean projects to ~$0.20/$2.01/$20.05 for 100/1,000/10,000 similar requests. Groq was independently exercised, but only on three smoke cases; its free-tier token limits constrain throughput and the account's cash tier was not inferred.
 
-```bash
-uv run rag trace <run-id-from-multi-page-answer>
-uv run rag ask "Which command creates a new Scrapy project?" --provider openai   # with an invalid/exhausted key, if safe to show
-```
-Explain the classification table ([architecture](architecture.md#providers-and-failures)): exhausted credits vs spend limit vs ambiguous quota vs rate limit; no retries on billing errors; bounded retries on transient ones; one visible fallback in `auto`; `rag trace` names the failing stage. (If showing a failure live is not practical, show `tests/test_pipeline.py::test_fallback_to_groq_is_visible_and_counted_once_per_attempt` and its trace output.)
-
-## 9:00-11:30 Evaluation
-
-Show [docs/evaluation.md](evaluation.md).
-
-- 15 frozen test questions across five categories plus a separate dev set and isolation set; labels from source review, with evidence groups and verbatim quotes checked against the index.
-- Retrieval comparison on identical inputs: dense, BM25, hybrid, hybrid + rerank. Hybrid chosen on dev; on test the reranker was best and hybrid did not beat dense on context recall. Say why the default was not changed after seeing test results.
-- Answer-level results: status accuracy per category, abstention, citation validity, and the manual support review (fill in from the live run).
-- Isolation: zero leaks.
-- Limits: tiny sample, strict quote-level scoring, snapshot drift.
-
-## 11:30-13:00 Costs
-
-Show [docs/cost-analysis.md](cost-analysis.md) and `uv run rag costs`.
-
-- Ingestion: $0 API (local embeddings), measured token counts and time.
-- One query: ~3K input tokens, measured composition; output from the live ledger.
-- 100 / 1,000 / 10,000 queries on gpt-4.1-mini and Groq; Groq free-tier daily token cap means it is not capacity for 1,000+ queries.
-
-## 13:00-14:30 Improvements
-
-- Larger dev set to decide between hybrid and hybrid + rerank (the reranker is already implemented as `--mode hybrid_rerank`).
-- Fix the T11-type retrieval gap (false-premise questions that name a nonexistent feature): query expansion or a second retrieval pass, measured on dev.
-- Claim-level support checking with an entailment model, evaluated before trusting it.
-- JavaScript-rendered sites via a headless browser, sitemap-seeded crawling, incremental refresh.
-- Hosted tracing (Langfuse) behind explicit configuration; a small API or UI if needed.
+End with the remaining measured problems: multi-part candidate misses, evidence lost to context limits, false-premise correction and semantic entailment. Future changes need a fresh holdout. No extra frontend, hosted trace service or autonomous loop is required to explain this implementation.

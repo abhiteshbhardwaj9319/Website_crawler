@@ -138,3 +138,12 @@ def test_demo_dispatches_real_question_and_explicit_options(run, monkeypatch):
     assert question == 'what is python command to get input'
     assert options == dict(site='2', provider='groq', mode=None, show_retrieval=False,
                            explain=False, as_json=False)
+
+
+def test_banner_shows_all_explicit_scope_paths():
+    from website_rag.render import site_banner
+    from .test_crawl_extract import make_site
+    site = make_site()
+    site.additional_path_prefixes = ['/reference/', '/builtins/']
+    text = site_banner(site).plain
+    assert site.allowed_path_prefix in text and '/reference/' in text and '/builtins/' in text

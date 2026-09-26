@@ -18,7 +18,10 @@ async def discover(crawler, client, limiter) -> list[str]:
     while queue and len(seen) < limits.max_sitemaps and len(pages) < limits.max_sitemap_urls:
         raw, depth = queue.pop(0)
         url = normalize_url(raw)
-        if url in seen or depth > limits.max_sitemap_depth:
+        if url in seen:
+            continue
+        if depth > limits.max_sitemap_depth:
+            crawler.discovery_limited = True
             continue
         seen.add(url)
         for _ in range(6):
@@ -33,11 +36,11 @@ async def discover(crawler, client, limiter) -> list[str]:
             async with client.stream('GET', url, timeout=limits.timeout_s) as response:
                 if response.status_code in (301, 302, 303, 307, 308):
                     if not response.headers.get('location'):
-                        break
+                        raise RagError(ErrorCode.FETCH_FAILED, 'Sitemap redirect has no location.', stage='crawl')
                     url = normalize_url(response.headers['location'], base=url)
                     continue
                 if response.status_code != 200:
-                    break
+                    raise RagError(ErrorCode.FETCH_FAILED, f'Sitemap returned HTTP {response.status_code}.', stage='crawl')
                 body = bytearray()
                 async for part in response.aiter_bytes():
                     body.extend(part)
@@ -49,6 +52,10 @@ async def discover(crawler, client, limiter) -> list[str]:
                     root = etree.fromstring(bytes(body), etree.XMLParser(resolve_entities=False, no_network=True))
                 except etree.XMLSyntaxError as exc:
                     raise RagError(ErrorCode.FETCH_FAILED, 'Sitemap XML is malformed.', stage='crawl') from exc
+                if root.getroottree().docinfo.doctype:
+                    raise RagError(ErrorCode.URL_REJECTED, 'Sitemap DTD/entities are forbidden.', stage='crawl')
+                if etree.QName(root).localname not in ('urlset', 'sitemapindex'):
+                    raise RagError(ErrorCode.FETCH_FAILED, 'Sitemap has an unsupported XML root.', stage='crawl')
                 nested = etree.QName(root).localname == 'sitemapindex'
                 for element in root.iter():
                     if not isinstance(element.tag, str) or etree.QName(element).localname != 'loc' or not element.text:
@@ -64,6 +71,8 @@ async def discover(crawler, client, limiter) -> list[str]:
                         if len(pages) >= limits.max_sitemap_urls:
                             break
                 break
+        else:
+            raise RagError(ErrorCode.FETCH_FAILED, 'Sitemap redirect limit exceeded.', stage='crawl')
     if queue or len(pages) >= limits.max_sitemap_urls:
         crawler.discovery_limited = True
     return sorted(pages)

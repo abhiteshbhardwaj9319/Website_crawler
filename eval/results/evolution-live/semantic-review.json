@@ -1,0 +1,499 @@
+{
+  "reviewer": "Codex, explicit claim-by-claim source comparison; not an independent human or automated entailment score",
+  "date": "2026-09-26",
+  "answers_sha256": "60ff8ad4b80f26eececf2e532039994c3b3c2e514be5fb0e1d6c8ea1aee6f4b5",
+  "rubric": "A claim passes only if every substantive assertion follows from its selected citations. Completeness requires all requested parts or a correct premise correction. No runtime semantic verifier is claimed.",
+  "accepted_claims": 50,
+  "fully_supported_claims": 45,
+  "answerable_cases": 26,
+  "complete_answers": 20,
+  "fully_grounded_complete_answers": 18,
+  "cases": [
+    {
+      "split": "holdout_v1",
+      "id": "H01",
+      "run_id": "r-f173ea757ea24d16",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H02",
+      "run_id": "r-50233909e8794390",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H03",
+      "run_id": "r-c40013521179487e",
+      "accepted_claims": 2,
+      "fully_supported_claims": 1,
+      "claim_findings": [
+        {
+          "claim_number": 2,
+          "judgment": "not_fully_supported",
+          "reason": "The selected code example does not establish highest precedence; that extra assertion is not supported by its citation."
+        }
+      ],
+      "answerable": true,
+      "complete": false,
+      "fully_grounded_and_complete": false,
+      "notes": "Cookies half omitted."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H04",
+      "run_id": "r-c93af69e32e04e54",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": false,
+      "fully_grounded_and_complete": false,
+      "notes": "Abstained instead of correcting the false CSS premise despite other CSS context."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H05",
+      "run_id": "r-86661e1a81be42fa",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H06",
+      "run_id": "r-729c8877077c4233",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H07",
+      "run_id": "r-720a5e04b01145d7",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H08",
+      "run_id": "r-cb3fbc38e80d47e1",
+      "accepted_claims": 2,
+      "fully_supported_claims": 2,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H09",
+      "run_id": "r-11c3536b04474e3d",
+      "accepted_claims": 3,
+      "fully_supported_claims": 2,
+      "claim_findings": [
+        {
+          "claim_number": 3,
+          "judgment": "not_fully_supported",
+          "reason": "getrandbits returns one integer, not a sequence of integers. The answer substitutes an unsupported solution."
+        }
+      ],
+      "answerable": true,
+      "complete": false,
+      "fully_grounded_and_complete": false,
+      "notes": "Arithmetic integer sequence part not answered."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H10",
+      "run_id": "r-3e11c61976024622",
+      "accepted_claims": 2,
+      "fully_supported_claims": 2,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H11",
+      "run_id": "r-c7f849cfe9ec42c6",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "holdout_v1",
+      "id": "H12",
+      "run_id": "r-90ac6c2c3bb246d2",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "test_observed",
+      "id": "T01",
+      "run_id": "r-a8deb83fc18a470c",
+      "accepted_claims": 2,
+      "fully_supported_claims": 2,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T02",
+      "run_id": "r-e4b6d6864622472a",
+      "accepted_claims": 3,
+      "fully_supported_claims": 3,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T03",
+      "run_id": "r-61ab80f1717f4967",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T04",
+      "run_id": "r-b7a681b071d14c64",
+      "accepted_claims": 3,
+      "fully_supported_claims": 3,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T05",
+      "run_id": "r-f7b70d08804f4bd1",
+      "accepted_claims": 2,
+      "fully_supported_claims": 2,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T06",
+      "run_id": "r-0e8818b6eb084df1",
+      "accepted_claims": 3,
+      "fully_supported_claims": 3,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T07",
+      "run_id": "r-942c58a1de384485",
+      "accepted_claims": 4,
+      "fully_supported_claims": 4,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T08",
+      "run_id": "r-90056006ffb74abd",
+      "accepted_claims": 2,
+      "fully_supported_claims": 2,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T09",
+      "run_id": "r-a5469f71861a45de",
+      "accepted_claims": 4,
+      "fully_supported_claims": 4,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T10",
+      "run_id": "r-34b207f3e31142d7",
+      "accepted_claims": 2,
+      "fully_supported_claims": 1,
+      "claim_findings": [
+        {
+          "claim_number": 1,
+          "judgment": "not_fully_supported",
+          "reason": "Accepts the false new-project default premise. Cited command output gives fallback 0 and does not override the documented project default 1."
+        }
+      ],
+      "answerable": true,
+      "complete": false,
+      "fully_grounded_and_complete": false,
+      "notes": "False premise was not corrected."
+    },
+    {
+      "split": "test_observed",
+      "id": "T11",
+      "run_id": "r-9ab743e0cd694654",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": false,
+      "fully_grounded_and_complete": false,
+      "notes": "Abstained instead of explaining lack of a built-in JavaScript renderer."
+    },
+    {
+      "split": "test_observed",
+      "id": "T12",
+      "run_id": "r-e5c519d54be54761",
+      "accepted_claims": 1,
+      "fully_supported_claims": 0,
+      "claim_findings": [
+        {
+          "claim_number": 1,
+          "judgment": "not_fully_supported",
+          "reason": "The universal no-setting guarantee assertion exceeds the cited mitigation bullets, even though the mitigation details are sourced."
+        }
+      ],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": false,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "test_observed",
+      "id": "T13",
+      "run_id": "r-f27a0b5812fa4da2",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "test_observed",
+      "id": "T14",
+      "run_id": "r-8b360879355c4f41",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "test_observed",
+      "id": "T15",
+      "run_id": "r-68cb6705b1034d16",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "isolation",
+      "id": "I01",
+      "run_id": "r-9e3e15f48cbd494e",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "isolation",
+      "id": "I02",
+      "run_id": "r-b77856d4bf4a4eff",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "isolation",
+      "id": "I03",
+      "run_id": "r-a3039b52aab04e78",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "isolation",
+      "id": "I04",
+      "run_id": "r-b7fe1ce938c246ad",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    },
+    {
+      "split": "isolation",
+      "id": "I05",
+      "run_id": "r-23e7d64f9f564af6",
+      "accepted_claims": 2,
+      "fully_supported_claims": 2,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": false,
+      "fully_grounded_and_complete": false,
+      "notes": "Command claim rejected for wrong passage ID; surviving this command statement has a dangling reference."
+    },
+    {
+      "split": "user",
+      "id": "U01",
+      "run_id": "r-002102cc0ef246bd",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "user",
+      "id": "U02",
+      "run_id": "r-4fb092705e554917",
+      "accepted_claims": 5,
+      "fully_supported_claims": 5,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "user",
+      "id": "U03",
+      "run_id": "r-e82762d31b534721",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "groq_independent",
+      "id": "U01",
+      "run_id": "r-075741ed35cc42dd",
+      "accepted_claims": 1,
+      "fully_supported_claims": 1,
+      "claim_findings": [],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": true,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "groq_independent",
+      "id": "U03",
+      "run_id": "r-3baed622eb7b4598",
+      "accepted_claims": 1,
+      "fully_supported_claims": 0,
+      "claim_findings": [
+        {
+          "claim_number": 1,
+          "judgment": "not_fully_supported",
+          "reason": "Only signatures input() and input(prompt, /) were selected; they do not themselves establish reading user input. The needed definition exists in context but is not cited."
+        }
+      ],
+      "answerable": true,
+      "complete": true,
+      "fully_grounded_and_complete": false,
+      "notes": "Remaining accepted claims directly supported by selected excerpts."
+    },
+    {
+      "split": "groq_independent",
+      "id": "H11",
+      "run_id": "r-4d16cd05ff44473d",
+      "accepted_claims": 0,
+      "fully_supported_claims": 0,
+      "claim_findings": [],
+      "answerable": false,
+      "complete": null,
+      "fully_grounded_and_complete": null,
+      "notes": "Correct abstention on absent or other-site evidence."
+    }
+  ]
+}
