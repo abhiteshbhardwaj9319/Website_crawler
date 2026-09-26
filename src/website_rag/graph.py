@@ -146,7 +146,7 @@ def build_graph(deps: QueryDeps):  # noqa: ANN201
                                  operation="embedding", input_tokens=count_tokens(state["question"]),
                                  output_tokens=0, measurement="local_count", cost_usd=0.0,
                                  pricing_version=pricing.version, outcome="success", latency_ms=elapsed)
-                span.set(results=[{"chunk_id": r.chunk.chunk_id, "rank": r.rank, "score": round(r.score, 5),
+                span.set(timings_ms=retriever.timings, results=[{"chunk_id": r.chunk.chunk_id, "rank": r.rank, "score": round(r.score, 5),
                                    "components": r.component_ranks, "page": r.chunk.source_url}
                                   for r in retrieved[:10]], count=len(retrieved))
                 return {"retrieved": retrieved}
@@ -162,14 +162,16 @@ def build_graph(deps: QueryDeps):  # noqa: ANN201
         with tracer.span("context", max_chunks=s.context_max_chunks, token_budget=s.evidence_token_budget) as span:
             try:
                 selected = select_context(state["retrieved"], s.context_max_chunks, s.evidence_token_budget,
-                                          state["site"].site_id, state["store"].corpus_id)
+                                          state["site"].site_id, state["store"].corpus_id, s.context_policy,
+                                          state['store'].load_chunks() if s.context_policy == 'neighbors' else None)
             except RagError as err:
                 span.fail(str(err.code), err.message)
                 return {"error": err}
             span.set(chunk_ids=[r.chunk.chunk_id for r in selected],
                      pages=sorted({r.chunk.source_url for r in selected}),
                      tokens=sum(r.chunk.token_count for r in selected))
-            return {"context": selected}
+            known = {r.chunk.chunk_id for r in state['retrieved']}
+            return {"context": selected, 'retrieved': state['retrieved'] + [r for r in selected if r.chunk.chunk_id not in known]}
 
     def abstain(state: QueryState) -> QueryState:
         tracer.event("abstain_without_generation", reason="no evidence retrieved")

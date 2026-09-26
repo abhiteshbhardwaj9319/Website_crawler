@@ -107,7 +107,8 @@ def score_answer(case: dict, result) -> dict:  # noqa: ANN001
     if expected == "abstain":
         behavior_ok = status == "insufficient_evidence"
     elif expected == "correct_premise":
-        behavior_ok = status in ("answered", "partially_answered", "insufficient_evidence") and bool(result.premise_issue.strip())
+        # Structural proxy only; semantic correction is reviewed explicitly in the report.
+        behavior_ok = status in ("answered", "partially_answered") and gold_cited > 0
     else:
         behavior_ok = status in ("answered", "partially_answered")
     return {
@@ -150,11 +151,13 @@ def run_evaluation(
             store.verify_ready(site, settings.embedding_model)
             row = {"id": case["id"], "category": case["category"], "site": site.number, "question": case["question"],
                    "expected_behavior": case["expected_behavior"], "mode": mode, "corpus_id": store.corpus_id}
+            row['retrieval'] = retrieval_metrics(case, [], [])
             if retrieval_only:
                 t0 = time.monotonic()
                 retrieved = Retriever(settings, site, store).search(case["question"], mode)
                 context = select_context(retrieved, settings.context_max_chunks, settings.evidence_token_budget,
-                                         site.site_id, store.corpus_id)
+                                         site.site_id, store.corpus_id, settings.context_policy,
+                                         store.load_chunks() if settings.context_policy == 'neighbors' else None)
                 row["retrieval_ms"] = int((time.monotonic() - t0) * 1000)
                 citations = []
             else:
@@ -192,9 +195,12 @@ def run_evaluation(
         summary = summarize_rows(rows, split, mode, retrieval_only, provider or settings.provider)
         summary["questions_sha256"] = file_sha256(split)
         summary["settings"] = {"candidate_k": settings.candidate_k, "context_max_chunks": settings.context_max_chunks,
+                               'rerank_k': settings.rerank_k, 'context_policy': settings.context_policy,
                                "evidence_token_budget": settings.evidence_token_budget, "embedding_model": settings.embedding_model,
                                "reranker_model": settings.reranker_model, "rrf_k": settings.rrf_k,
                                "openai_model": settings.openai_model, "groq_model": settings.groq_model}
+        from .generate import prompt_fingerprint
+        summary['prompt'] = prompt_fingerprint()
         summary["results_file"] = f"{tag}.jsonl"
         (out / f"{tag}.jsonl").write_text("\n".join(json.dumps(r, ensure_ascii=False, default=str) for r in rows) + "\n", encoding="utf-8")
         (out / f"{tag}_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")

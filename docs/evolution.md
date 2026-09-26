@@ -23,6 +23,10 @@ Confirmed defects: unchecked `draft.answer`/premise prose can bypass claim check
 
 `answer_v2` uses `AnswerSelection` (status, claims, chunk/passsage IDs); exact passages are generated locally. No index migration or paid repair call is needed. Existing `answer_v1` records and their original prompt remain available; new output does not display their unchecked prose. Legacy quote validation now preserves case and treats ellipses literally. This establishes structural linkage, not semantic truth. Live v2 quality/cost measurement follows after coverage work.
 
+## E4 retrieval selection
+
+The expanded development set was frozen before tuning, followed by a separately invoked new holdout. Rerank20 recovered 19/19 development evidence groups versus hybrid20 16/19, at 1,742 versus 124 ms mean retrieval. The preselected reranker recovered 7/10 on holdout; hybrid recovered 8/10 at 133 versus 2,038 ms. Candidate-depth, diversity/dedup and neighbor ablations did not beat the selected development tradeoff. These are measured tradeoffs, not a universal retrieval improvement. Original observed-test context recall on the expanded corpus is 16/21 with reranking, versus historical 17/21 on the smaller corpus; corpus composition and stricter quote scoring also changed. See [evaluation](evaluation.md) for stage failures and cold/warm measurement limits.
+
 ## E3 scope, checkpoint and ingestion results
 
 95 offline tests pass, 3 live tests skipped. Targeted resume/interruption/sitemap/scope tests also pass after checkpoint recovery hardening. Scrapy: 45 ? 144 accepted pages, 945 ? 1,895 chunks, 0 pending, 0 failures; 945 vectors reused, 950 new vectors, 225,797 local embedding tokens, 249.9 seconds. Python: 17 ? 90 pages, 251 ? 4,611 chunks, 186 pending at its declared cap, 0 failures; 251 vectors reused, 4,360 new, 556,050 local tokens, 755.5 seconds including embedding/indexing (the 600-second bound is crawl time only). See [coverage details](corpus.md).

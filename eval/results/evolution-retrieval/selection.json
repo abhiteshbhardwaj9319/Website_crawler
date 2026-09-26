@@ -1,0 +1,12 @@
+{
+  "variant": [
+    "rerank20",
+    "hybrid_rerank",
+    20,
+    20,
+    "ranked"
+  ],
+  "selected_before_holdout": true,
+  "rationale": "19/19 development context evidence vs 16/19 hybrid; depth40 rerank drops to 18/19, diversity/neighbors do not improve hybrid. Choose smaller rerank depth20; accept measured ~1.7s local latency for recall.",
+  "tradeoff": "Hybrid40 is faster (~127ms) at 18/19; users can select it with configuration. No query reformulation added without a residual dev paraphrase miss."
+}

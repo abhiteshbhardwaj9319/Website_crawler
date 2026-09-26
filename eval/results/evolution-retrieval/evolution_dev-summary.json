@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "split": "evolution_dev",
+    "questions_sha256": "2bdc88566a33ed04a189895bf1adf58cbb4815ef7fdb8e96140dd147e69a7f83",
+    "prompt": "answer_v2:9b4df833854f",
+    "corpora": {
+      "1": "scrapy-docs-2-19--20260926T002328-527e90",
+      "2": "python-tutorial-3-13--20260926T002925-aba199"
+    },
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "context_max_chunks": 10,
+    "evidence_token_budget": 3000,
+    "scoring": "exact contiguous quote, whitespace normalized; case preserved"
+  },
+  "variants": [
+    {
+      "variant": [
+        "dense20",
+        "dense",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 16,
+      "groups": 19,
+      "context_recall": "16/19",
+      "mean_ms": 136.09,
+      "warm_mean_ms": 116.8,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "bm2520",
+        "bm25",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 17,
+      "groups": 19,
+      "context_recall": "17/19",
+      "mean_ms": 30.1,
+      "warm_mean_ms": 22.5,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "hybrid20",
+        "hybrid",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 16,
+      "groups": 19,
+      "context_recall": "16/19",
+      "mean_ms": 123.51,
+      "warm_mean_ms": 123.24,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "rerank20",
+        "hybrid_rerank",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 19,
+      "groups": 19,
+      "context_recall": "19/19",
+      "mean_ms": 1741.68,
+      "warm_mean_ms": 1706.71,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "hybrid40",
+        "hybrid",
+        40,
+        20,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 18,
+      "groups": 19,
+      "context_recall": "18/19",
+      "mean_ms": 126.56,
+      "warm_mean_ms": 122.78,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "rerank40",
+        "hybrid_rerank",
+        40,
+        40,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 18,
+      "groups": 19,
+      "context_recall": "18/19",
+      "mean_ms": 3681.67,
+      "warm_mean_ms": 3678.53,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "rerank40_depth20",
+        "hybrid_rerank",
+        40,
+        20,
+        "ranked"
+      ],
+      "cases": 20,
+      "hits": 19,
+      "groups": 19,
+      "context_recall": "19/19",
+      "mean_ms": 1881.28,
+      "warm_mean_ms": 1886.77,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "hybrid_diverse",
+        "hybrid",
+        20,
+        20,
+        "diverse"
+      ],
+      "cases": 20,
+      "hits": 16,
+      "groups": 19,
+      "context_recall": "16/19",
+      "mean_ms": 116.64,
+      "warm_mean_ms": 114.43,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "hybrid_neighbors",
+        "hybrid",
+        20,
+        20,
+        "neighbors"
+      ],
+      "cases": 20,
+      "hits": 16,
+      "groups": 19,
+      "context_recall": "16/19",
+      "mean_ms": 124.06,
+      "warm_mean_ms": 125.46,
+      "isolation_leaks": 0
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "split": "holdout_v1",
+    "questions_sha256": "06f33a6d491358217d25907aeb90876c303b1f486688e99486e5e33a4edd2204",
+    "prompt": "answer_v2:9b4df833854f",
+    "corpora": {
+      "1": "scrapy-docs-2-19--20260926T002328-527e90",
+      "2": "python-tutorial-3-13--20260926T002925-aba199"
+    },
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "context_max_chunks": 10,
+    "evidence_token_budget": 3000,
+    "scoring": "exact contiguous quote, whitespace normalized; case preserved"
+  },
+  "variants": [
+    {
+      "variant": [
+        "dense20",
+        "dense",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 12,
+      "hits": 6,
+      "groups": 10,
+      "context_recall": "6/10",
+      "mean_ms": 161.23,
+      "warm_mean_ms": 121.25,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "bm2520",
+        "bm25",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 12,
+      "hits": 7,
+      "groups": 10,
+      "context_recall": "7/10",
+      "mean_ms": 49.44,
+      "warm_mean_ms": 34.21,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "hybrid20",
+        "hybrid",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 12,
+      "hits": 8,
+      "groups": 10,
+      "context_recall": "8/10",
+      "mean_ms": 133.46,
+      "warm_mean_ms": 132.14,
+      "isolation_leaks": 0
+    },
+    {
+      "variant": [
+        "rerank20",
+        "hybrid_rerank",
+        20,
+        20,
+        "ranked"
+      ],
+      "cases": 12,
+      "hits": 7,
+      "groups": 10,
+      "context_recall": "7/10",
+      "mean_ms": 2037.83,
+      "warm_mean_ms": 2030.96,
+      "isolation_leaks": 0
+    }
+  ]
+}

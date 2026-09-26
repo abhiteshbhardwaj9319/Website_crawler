@@ -1,0 +1,706 @@
+{
+  "metadata": {
+    "split": "holdout_v1",
+    "questions_sha256": "06f33a6d491358217d25907aeb90876c303b1f486688e99486e5e33a4edd2204",
+    "prompt": "answer_v2:9b4df833854f",
+    "corpora": {
+      "1": "scrapy-docs-2-19--20260926T002328-527e90",
+      "2": "python-tutorial-3-13--20260926T002925-aba199"
+    },
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "reranker_model": "Xenova/ms-marco-MiniLM-L-6-v2",
+    "context_max_chunks": 10,
+    "evidence_token_budget": 3000,
+    "scoring": "exact contiguous quote, whitespace normalized; case preserved"
+  },
+  "summary": {
+    "variant": [
+      "hybrid20",
+      "hybrid",
+      20,
+      20,
+      "ranked"
+    ],
+    "cases": 12,
+    "hits": 8,
+    "groups": 10,
+    "context_recall": "8/10",
+    "mean_ms": 133.46,
+    "warm_mean_ms": 132.14,
+    "isolation_leaks": 0
+  },
+  "rows": [
+    {
+      "id": "H01",
+      "site": 1,
+      "question": "Which log levels can LOG_LEVEL accept?",
+      "metrics": {
+        "groups": 1,
+        "group_ranks": [
+          1
+        ],
+        "context_group_hits": 1,
+        "required_pages": 1,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 1,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 1,
+        "hits@6": 1,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context"
+      ],
+      "retrieval_ms": 148.02,
+      "context_ms": 0.25,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.07259999983943999,
+        "query_embedding_ms": 12.680599989835173,
+        "dense_ms": 128.3654999861028,
+        "lexical_ms": 6.405399995855987
+      },
+      "context_ids": [
+        "b683844b4b2af11315e3eb3b",
+        "d5ea2eb34a4dba1edc5aadc8",
+        "4b364d55332e8303b7c0b387",
+        "47960c9d952e061a68339427",
+        "ea9657c131889ca159bc5d84",
+        "a33d3ad2a60919b05dadf35b",
+        "2bb80e79f498c108c183cbb1",
+        "714d9f96d0d4cfed6c82a31b",
+        "4a5a93eb1846e906a67b4371",
+        "91616e8695427eb4518d4acf"
+      ],
+      "context_urls": [
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#log-level",
+        "https://docs.scrapy.org/en/2.19/topics/logging.html#log-levels",
+        "https://docs.scrapy.org/en/2.19/topics/logging.html#logging-settings",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/log.html",
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#default-dropitem-log-level",
+        "https://docs.scrapy.org/en/2.19/topics/optimize.html#lowering-cpu-usage",
+        "https://docs.scrapy.org/en/2.19/topics/request-response.html#give-up-log-level",
+        "https://docs.scrapy.org/en/2.19/topics/downloader-middleware.html#module-scrapy.downloadermiddlewares.retry",
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#command-line-settings",
+        "https://docs.scrapy.org/en/2.19/topics/downloader-middleware.html#retry-give-up-log-level"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H02",
+      "site": 1,
+      "question": "What does DEPTH_LIMIT control?",
+      "metrics": {
+        "groups": 1,
+        "group_ranks": [
+          1
+        ],
+        "context_group_hits": 1,
+        "required_pages": 1,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 1,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 1,
+        "hits@6": 1,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context"
+      ],
+      "retrieval_ms": 101.45,
+      "context_ms": 0.14,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.1188000023830682,
+        "query_embedding_ms": 11.605200008489192,
+        "dense_ms": 87.93859998695552,
+        "lexical_ms": 1.5955999842844903
+      },
+      "context_ids": [
+        "b9656135b7888d7677a2ea7c",
+        "2638bd427db5693894b5d412",
+        "538437130b2cc77bba9d05b8",
+        "a95a691a2b05d3b131c874db",
+        "24ecea40970c5a2cb335ec5e",
+        "4d48671bc62c9b41df1d2488",
+        "9887ef6713cd647cd0477d9d",
+        "47ca5dcb39a190acf706033f",
+        "6b0176fb724f4afa80383d11",
+        "2dc045876781c41aaa3d59b1"
+      ],
+      "context_urls": [
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#depth-limit",
+        "https://docs.scrapy.org/en/2.19/topics/spider-middleware.html#module-scrapy.spidermiddlewares.depth",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/spidermiddlewares/depth.html",
+        "https://docs.scrapy.org/en/2.19/topics/spider-middleware.html#depth-reset",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/spidermiddlewares/depth.html",
+        "https://docs.scrapy.org/en/2.19/topics/extensions.html#remote-control-output-max-bytes",
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#depth-priority",
+        "https://docs.scrapy.org/en/2.19/topics/downloader-middleware.html#httpcache-ignore-response-cache-controls",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/spidermiddlewares/depth.html",
+        "https://docs.scrapy.org/en/2.19/topics/optimize.html#lowering-memory-usage"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H03",
+      "site": 1,
+      "question": "How do I turn cookies off and make the log less verbose with LOG_LEVEL?",
+      "metrics": {
+        "groups": 2,
+        "group_ranks": [
+          null,
+          10
+        ],
+        "context_group_hits": 1,
+        "required_pages": 2,
+        "required_pages_in_context": 2,
+        "first_hit_rank": 10,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 0,
+        "hits@6": 0,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "candidate_miss",
+        "context"
+      ],
+      "retrieval_ms": 74.2,
+      "context_ms": 0.23,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.055199983762577176,
+        "query_embedding_ms": 8.939599996665493,
+        "dense_ms": 59.74959998275153,
+        "lexical_ms": 5.1617999852169305
+      },
+      "context_ids": [
+        "3a5a3fba8cd88d77d727a244",
+        "4b364d55332e8303b7c0b387",
+        "a33d3ad2a60919b05dadf35b",
+        "94e483705f7ec3608f57b74b",
+        "47960c9d952e061a68339427",
+        "8059c9691c488ab42850854d",
+        "a592b674b4d095681dcdb75f",
+        "ea9657c131889ca159bc5d84",
+        "3c978a5604d12698f099bc99",
+        "b683844b4b2af11315e3eb3b"
+      ],
+      "context_urls": [
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/request.html",
+        "https://docs.scrapy.org/en/2.19/topics/logging.html#logging-settings",
+        "https://docs.scrapy.org/en/2.19/topics/optimize.html#lowering-cpu-usage",
+        "https://docs.scrapy.org/en/2.19/faq.html#how-can-i-make-scrapy-consume-less-memory",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/log.html",
+        "https://docs.scrapy.org/en/2.19/topics/cookies.html#setting-cookies-on-a-request",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/downloadermiddlewares/cookies.html",
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#default-dropitem-log-level",
+        "https://docs.scrapy.org/en/2.19/topics/cookies.html#cookies-debug",
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#log-level"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H04",
+      "site": 1,
+      "question": "Why can Scrapy only select elements using XPath, never CSS?",
+      "metrics": {
+        "groups": 1,
+        "group_ranks": [
+          9
+        ],
+        "context_group_hits": 1,
+        "required_pages": 1,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 9,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 0,
+        "hits@6": 0,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context"
+      ],
+      "retrieval_ms": 66.13,
+      "context_ms": 0.27,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.0399000127799809,
+        "query_embedding_ms": 8.66439999663271,
+        "dense_ms": 51.18599999696016,
+        "lexical_ms": 6.009500008076429
+      },
+      "context_ids": [
+        "44fd4a145b79d60b4261ccd1",
+        "e35c3593f8fed507061bec5a",
+        "cf3bb200460877b8559436d6",
+        "d129500ee0877e3563f28555",
+        "b021725a0193298bbeb81f06",
+        "193f9bd040811bac757fec74",
+        "f333691ddda90809a2b98c22",
+        "72608390650e79f36069c16f",
+        "48b8718038d49adea7d9fa4e",
+        "73a449d641c4807f4b220d25"
+      ],
+      "context_urls": [
+        "https://docs.scrapy.org/en/2.19/intro/tutorial.html#xpath-a-brief-intro",
+        "https://docs.scrapy.org/en/2.19/intro/tutorial.html#extracting-data",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#extensions-to-css-selectors",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#when-querying-by-class-consider-using-css",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#id1",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#constructing-selectors",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#id1",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#using-text-nodes-in-a-condition",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#selectors",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#selecting-element-attributes"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H05",
+      "site": 1,
+      "question": "How much annual profit does Scrapy earn?",
+      "metrics": {
+        "groups": 0,
+        "group_ranks": [],
+        "context_group_hits": 0,
+        "required_pages": 0,
+        "required_pages_in_context": 0,
+        "first_hit_rank": null,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 0,
+        "hits@3": 0,
+        "hits@6": 0,
+        "hits@10": 0,
+        "hits@20": 0
+      },
+      "failure_stages": [],
+      "retrieval_ms": 71.52,
+      "context_ms": 0.22,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.0515999854542315,
+        "query_embedding_ms": 6.997699994826689,
+        "dense_ms": 59.84249999164604,
+        "lexical_ms": 4.348099988419563
+      },
+      "context_ids": [
+        "35acb70d1ff296e1d5f57025",
+        "46f68b66f01f0df9688cd5d2",
+        "cac783a34bc7454cc60f70c5",
+        "050e46e0cb9645745d6b2f40",
+        "0c50296a32eb82fe87bd0f40",
+        "e75d69027a2526149dfc2b37",
+        "5f3982997816d43f762cd7de",
+        "e10ea1dc6938f3d3fff5f95f",
+        "a0677355be2762c03dec4379",
+        "afa8d21c29d1dcadf1bd3f6f"
+      ],
+      "context_urls": [
+        "https://docs.scrapy.org/en/2.19/topics/benchmarking.html#benchmarking",
+        "https://docs.scrapy.org/en/2.19/intro/overview.html#what-else",
+        "https://docs.scrapy.org/en/2.19/topics/benchmarking.html#benchmarking",
+        "https://docs.scrapy.org/en/2.19/contributing.html#finding-work",
+        "https://docs.scrapy.org/en/2.19/topics/benchmarking.html#benchmarking",
+        "https://docs.scrapy.org/en/2.19/topics/items.html#declaring-item-subclasses",
+        "https://docs.scrapy.org/en/2.19/intro/overview.html#scrapy-at-a-glance",
+        "https://docs.scrapy.org/en/2.19/topics/deploy.html#deploying-spiders",
+        "https://docs.scrapy.org/en/2.19/topics/selectors.html#working-with-xpaths",
+        "https://docs.scrapy.org/en/2.19/topics/benchmarking.html#benchmarking"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H06",
+      "site": 1,
+      "question": "What Python built-in reads one line typed by the user?",
+      "metrics": {
+        "groups": 0,
+        "group_ranks": [],
+        "context_group_hits": 0,
+        "required_pages": 0,
+        "required_pages_in_context": 0,
+        "first_hit_rank": null,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 0,
+        "hits@3": 0,
+        "hits@6": 0,
+        "hits@10": 0,
+        "hits@20": 0
+      },
+      "failure_stages": [],
+      "retrieval_ms": 98.79,
+      "context_ms": 0.34,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.05500001134350896,
+        "query_embedding_ms": 8.341200009454042,
+        "dense_ms": 82.06380001502112,
+        "lexical_ms": 7.973100000526756
+      },
+      "context_ids": [
+        "65b072cf097bbacafa2f9596",
+        "2f42a8d6e89225f519082831",
+        "4e4617d359f8958d595d927e",
+        "114a24234d5157dd71647115",
+        "a2a445e42c219f0b142f8455",
+        "ac74e598d93da8f072d98172",
+        "9ce46e98430ec6af4a40ad0a",
+        "e1d1acb84cd3ef3337527e4a",
+        "8d0c2d22e83f914b03af0486",
+        "efb097b9200aa1ca5596c00a"
+      ],
+      "context_urls": [
+        "https://docs.scrapy.org/en/2.19/topics/settings.html#robotstxt-user-agent",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/iterators.html",
+        "https://docs.scrapy.org/en/2.19/topics/commands.html#commands-that-run-a-crawl",
+        "https://docs.scrapy.org/en/2.19/topics/commands.html#configuration-settings",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/iterators.html",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/iterators.html",
+        "https://docs.scrapy.org/en/2.19/_modules/scrapy/utils/python.html",
+        "https://docs.scrapy.org/en/2.19/topics/commands.html#list",
+        "https://docs.scrapy.org/en/2.19/topics/leaks.html#debugging-memory-leaks-with-muppy",
+        "https://docs.scrapy.org/en/2.19/topics/commands.html#fetch"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H07",
+      "site": 2,
+      "question": "What does list.remove do when the requested value is missing?",
+      "metrics": {
+        "groups": 1,
+        "group_ranks": [
+          3
+        ],
+        "context_group_hits": 1,
+        "required_pages": 1,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 3,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 1,
+        "hits@6": 1,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context"
+      ],
+      "retrieval_ms": 243.46,
+      "context_ms": 0.16,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.07999999797903001,
+        "query_embedding_ms": 15.570899995509535,
+        "dense_ms": 214.92870000656694,
+        "lexical_ms": 12.625500006834045
+      },
+      "context_ids": [
+        "733a2b976a8acc1d082ce81b",
+        "4e427e303fba95e6740c77ff",
+        "70326e97bfc29704cfc79f9d",
+        "faecd169af89894fe9ad355b",
+        "e2d7021a278018f975d10be7",
+        "acb5151d5e2c2a7dddea8d5d",
+        "9d67beadcdeebc0af824271d",
+        "baebead8e5fbd0f39f690a50",
+        "3a5bca7d0f12a74962792322",
+        "e03b80365646b331f648973b"
+      ],
+      "context_urls": [
+        "https://docs.python.org/3.13/builtins/stdtypes.html#sequence.remove",
+        "https://docs.python.org/3.13/library/collections.html#collections.deque.remove",
+        "https://docs.python.org/3.13/tutorial/datastructures.html#more-on-lists",
+        "https://docs.python.org/3.13/tutorial/datastructures.html#the-del-statement",
+        "https://docs.python.org/3.13/tutorial/datastructures.html#more-on-lists",
+        "https://docs.python.org/3.13/library/array.html#array.array.remove",
+        "https://docs.python.org/3.13/tutorial/datastructures.html#more-on-lists",
+        "https://docs.python.org/3.13/builtins/exceptions.html#IsADirectoryError",
+        "https://docs.python.org/3.13/tutorial/datastructures.html#more-on-lists",
+        "https://docs.python.org/3.13/library/enum.html#enum.Enum._missing_"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H08",
+      "site": 2,
+      "question": "How do I make a tutorial-env virtual environment?",
+      "metrics": {
+        "groups": 1,
+        "group_ranks": [
+          2
+        ],
+        "context_group_hits": 1,
+        "required_pages": 1,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 2,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 1,
+        "hits@6": 1,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context"
+      ],
+      "retrieval_ms": 156.44,
+      "context_ms": 0.26,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.056199991377070546,
+        "query_embedding_ms": 13.125700003001839,
+        "dense_ms": 135.31489999149926,
+        "lexical_ms": 7.6820999966003
+      },
+      "context_ids": [
+        "723764e2205f422b4e3f34bf",
+        "7245c1dcf158d7750f95c3b2",
+        "e3a5e398d203628b15fafa5d",
+        "50b34a08ab67628950fc0ba6",
+        "9a1c4ddff842d66b301a633a",
+        "14b902750c1fd1faf8f65d4a",
+        "e97e7735e4b2dae5d93177a8",
+        "988709fa27b030b071e675e3",
+        "0882335fe9bb9e3d2596b519",
+        "459087ef2b24af1ce49b55f9"
+      ],
+      "context_urls": [
+        "https://docs.python.org/3.13/tutorial/venv.html#creating-virtual-environments",
+        "https://docs.python.org/3.13/tutorial/venv.html#creating-virtual-environments",
+        "https://docs.python.org/3.13/tutorial/venv.html#managing-packages-with-pip",
+        "https://docs.python.org/3.13/tutorial/venv.html#managing-packages-with-pip",
+        "https://docs.python.org/3.13/tutorial/venv.html#introduction",
+        "https://docs.python.org/3.13/tutorial/venv.html#managing-packages-with-pip",
+        "https://docs.python.org/3.13/library/os.html#os.spawnvpe",
+        "https://docs.python.org/3.13/library/os.html#os.execvpe",
+        "https://docs.python.org/3.13/library/os.html#os.spawnlpe",
+        "https://docs.python.org/3.13/library/sys.html#sys.base_prefix"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H09",
+      "site": 2,
+      "question": "How can I turn a Python list into JSON text and generate a sequence of integers?",
+      "metrics": {
+        "groups": 2,
+        "group_ranks": [
+          1,
+          null
+        ],
+        "context_group_hits": 1,
+        "required_pages": 2,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 1,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 1,
+        "hits@6": 1,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context",
+        "candidate_miss"
+      ],
+      "retrieval_ms": 157.23,
+      "context_ms": 0.21,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.051000009989365935,
+        "query_embedding_ms": 9.073599998373538,
+        "dense_ms": 135.63489998341538,
+        "lexical_ms": 12.229799991473556
+      },
+      "context_ids": [
+        "bd3a564c1267e63e90db5e03",
+        "17e98cfcea860a31359c9bbd",
+        "47ab9ad648291f6e88ffc899",
+        "536852e94de89c1517d3f9ed",
+        "5a8699fd48bcd8a70ee15afd",
+        "6b47269b6c24e8df056ba1f1",
+        "75252496f4dff09c232c563e",
+        "84c1ef2fc2e768b7ea772987",
+        "9ce7105a640ff4ebed60e183",
+        "0ba28b3c555ebd464a698efa"
+      ],
+      "context_urls": [
+        "https://docs.python.org/3.13/tutorial/inputoutput.html#saving-structured-data-with-json",
+        "https://docs.python.org/3.13/tutorial/inputoutput.html#saving-structured-data-with-json",
+        "https://docs.python.org/3.13/library/pickle.html#comparison-with-json",
+        "https://docs.python.org/3.13/builtins/stdtypes.html#common-sequence-operations",
+        "https://docs.python.org/3.13/tutorial/introduction.html#lists",
+        "https://docs.python.org/3.13/tutorial/introduction.html#lists",
+        "https://docs.python.org/3.13/builtins/stdtypes.html#bytes.hex",
+        "https://docs.python.org/3.13/tutorial/introduction.html#text",
+        "https://docs.python.org/3.13/builtins/stdtypes.html#bytearray.hex",
+        "https://docs.python.org/3.13/library/importlib.html#importing-a-source-file-directly"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H10",
+      "site": 2,
+      "question": "Are exceptions always fatal even when a program handles them?",
+      "metrics": {
+        "groups": 1,
+        "group_ranks": [
+          1
+        ],
+        "context_group_hits": 1,
+        "required_pages": 1,
+        "required_pages_in_context": 1,
+        "first_hit_rank": 1,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 1,
+        "hits@3": 1,
+        "hits@6": 1,
+        "hits@10": 1,
+        "hits@20": 1
+      },
+      "failure_stages": [
+        "context"
+      ],
+      "retrieval_ms": 149.52,
+      "context_ms": 0.23,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.02710000262595713,
+        "query_embedding_ms": 8.903999987524003,
+        "dense_ms": 130.87560000712983,
+        "lexical_ms": 9.491000004345551
+      },
+      "context_ids": [
+        "1a71b015d66ccee5ad3be572",
+        "c3586bd87328d7264a4b69a4",
+        "4782339b899fcd3fe8069876",
+        "f0d308d16c88c1ae0d6fdf62",
+        "5eaa233047c61f4f629bb6d4",
+        "af6a7b559b93cf54e090e2c0",
+        "5700e458c89fe109e371bc88",
+        "40423561ca02c0b8b431dfe2",
+        "f2e135f55c1b517c7302b7b4",
+        "883f7bfee1ce1470332e5ba4"
+      ],
+      "context_urls": [
+        "https://docs.python.org/3.13/tutorial/errors.html#exceptions",
+        "https://docs.python.org/3.13/tutorial/errors.html#handling-exceptions",
+        "https://docs.python.org/3.13/builtins/exceptions.html#KeyboardInterrupt",
+        "https://docs.python.org/3.13/builtins/exceptions.html#built-in-exceptions",
+        "https://docs.python.org/3.13/tutorial/errors.html#raising-and-handling-multiple-unrelated-exceptions",
+        "https://docs.python.org/3.13/tutorial/appendix.html#error-handling",
+        "https://docs.python.org/3.13/tutorial/errors.html#raising-and-handling-multiple-unrelated-exceptions",
+        "https://docs.python.org/3.13/tutorial/errors.html#handling-exceptions",
+        "https://docs.python.org/3.13/library/sys.html#sys.excepthook",
+        "https://docs.python.org/3.13/tutorial/errors.html#handling-exceptions"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H11",
+      "site": 2,
+      "question": "Who will win the next world chess championship?",
+      "metrics": {
+        "groups": 0,
+        "group_ranks": [],
+        "context_group_hits": 0,
+        "required_pages": 0,
+        "required_pages_in_context": 0,
+        "first_hit_rank": null,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 0,
+        "hits@3": 0,
+        "hits@6": 0,
+        "hits@10": 0,
+        "hits@20": 0
+      },
+      "failure_stages": [],
+      "retrieval_ms": 155.87,
+      "context_ms": 0.14,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.050700007705017924,
+        "query_embedding_ms": 8.272599981864914,
+        "dense_ms": 139.3095999956131,
+        "lexical_ms": 7.9926000034902245
+      },
+      "context_ids": [
+        "4cfb6e2412abaf13d812444b",
+        "aa049015b4e52f93551a7765",
+        "d083974ef1a64e81161fde12",
+        "25721e0fa3627253359f8b3d",
+        "3b2a2d8981f0d699d405f10a",
+        "20d86c4917023989486c440f",
+        "492879ef33f238a5d7742d1d",
+        "27c74db2b4f62c04d0c8d840",
+        "82bb9f841da268697e314906",
+        "060a63ce0e6e46658edbcc62"
+      ],
+      "context_urls": [
+        "https://docs.python.org/3.13/builtins/functions.html#next",
+        "https://docs.python.org/3.13/library/dbm.html#dbm.gnu.gdbm.nextkey",
+        "https://docs.python.org/3.13/tutorial/inputoutput.html#fancier-output-formatting",
+        "https://docs.python.org/3.13/library/rlcompleter.html#rlcompleter.Completer",
+        "https://docs.python.org/3.13/library/tempfile.html#examples",
+        "https://docs.python.org/3.13/library/rlcompleter.html#rlcompleter.Completer.complete",
+        "https://docs.python.org/3.13/builtins/stdtypes.html#bytearray.istitle",
+        "https://docs.python.org/3.13/library/textwrap.html#textwrap.shorten",
+        "https://docs.python.org/3.13/library/reprlib.html#reprlib.Repr.maxdeque",
+        "https://docs.python.org/3.13/builtins/stdtypes.html#str.swapcase"
+      ],
+      "isolation_ok": true
+    },
+    {
+      "id": "H12",
+      "site": 2,
+      "question": "Which setting configures Scrapy downloader middleware?",
+      "metrics": {
+        "groups": 0,
+        "group_ranks": [],
+        "context_group_hits": 0,
+        "required_pages": 0,
+        "required_pages_in_context": 0,
+        "first_hit_rank": null,
+        "multi_page_complete": false,
+        "evidence_pages_in_context": 0,
+        "hits@3": 0,
+        "hits@6": 0,
+        "hits@10": 0,
+        "hits@20": 0
+      },
+      "failure_stages": [],
+      "retrieval_ms": 178.9,
+      "context_ms": 0.15,
+      "timings_ms": {
+        "embedding_model_load_ms": 0.05420000525191426,
+        "query_embedding_ms": 9.235000004991889,
+        "dense_ms": 160.8004000154324,
+        "lexical_ms": 8.522499992977828
+      },
+      "context_ids": [
+        "2bd0059c45a939654acf753a",
+        "7c6c1ca3edaf7afb4e1fe214",
+        "990c61842a7713c4633f8079",
+        "e0dde4985ba4a4225d7c7415",
+        "e3a5e398d203628b15fafa5d",
+        "fe435d06ca2516f69c119c27",
+        "1503705a124a80dd1c432b30",
+        "8832c194db92304a76bd8d10",
+        "5aaf8589ee5fd61ac2c29d7d",
+        "fbb8edc7e36889788de5fa65"
+      ],
+      "context_urls": [
+        "https://docs.python.org/3.13/tutorial/modules.html#the-dir-function",
+        "https://docs.python.org/3.13/library/locale.html#locale.getencoding",
+        "https://docs.python.org/3.13/tutorial/modules.html#the-dir-function",
+        "https://docs.python.org/3.13/library/locale.html#locale.LC_ALL",
+        "https://docs.python.org/3.13/tutorial/venv.html#managing-packages-with-pip",
+        "https://docs.python.org/3.13/library/io.html#io.TextIOBase.errors",
+        "https://docs.python.org/3.13/library/io.html#module-io",
+        "https://docs.python.org/3.13/library/calendar.html#calendar.firstweekday",
+        "https://docs.python.org/3.13/library/intro.html#webassembly-platforms",
+        "https://docs.python.org/3.13/library/locale.html#locale.getpreferredencoding"
+      ],
+      "isolation_ok": true
+    }
+  ]
+}

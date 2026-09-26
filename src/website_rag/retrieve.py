@@ -12,7 +12,8 @@ and are never used as answerability confidence.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import time
 
 from .chunk import embedding_text
 from .config import RetrievalMode, Settings
@@ -52,6 +53,7 @@ class Retriever:
     store: CorpusStore
     embedder: Embedder | None = None
     reranker: object | None = None
+    timings: dict[str, float] = field(default_factory=dict)
 
     def _embedder(self) -> Embedder:
         if self.embedder is None:
@@ -73,10 +75,21 @@ class Retriever:
 
         dense: list[tuple[ChunkRecord, float]] = []
         lexical: list[tuple[ChunkRecord, float]] = []
+        self.timings = {}
         if mode in ("dense", "hybrid", "hybrid_rerank"):
-            dense = self.store.dense_search(self._embedder().embed_query(question), k)
+            t = time.perf_counter()
+            embedder = self._embedder()
+            self.timings['embedding_model_load_ms'] = (time.perf_counter() - t) * 1000
+            t = time.perf_counter()
+            vector = embedder.embed_query(question)
+            self.timings['query_embedding_ms'] = (time.perf_counter() - t) * 1000
+            t = time.perf_counter()
+            dense = self.store.dense_search(vector, k)
+            self.timings['dense_ms'] = (time.perf_counter() - t) * 1000
         if mode in ("bm25", "hybrid", "hybrid_rerank"):
+            t = time.perf_counter()
             lexical = self.store.bm25_search(question, k)
+            self.timings['lexical_ms'] = (time.perf_counter() - t) * 1000
         for chunk, _ in (*dense, *lexical):
             _check_isolation(chunk, site_id, corpus_id)
 
@@ -92,31 +105,70 @@ class Retriever:
             return [RetrievedChunk(chunk=c, retriever="hybrid", rank=i, score=s, component_ranks=r)
                     for i, (c, s, r) in enumerate(fused, start=1)]
 
-        scores = self._reranker().score(question, [embedding_text(c) for c, _, _ in fused])
-        order = sorted(range(len(fused)), key=lambda i: -scores[i])
+        depth = min(len(fused), self.settings.rerank_k)
+        if not depth:
+            return []
+        t = time.perf_counter()
+        reranker = self._reranker()
+        self.timings['reranker_model_load_ms'] = (time.perf_counter() - t) * 1000
+        t = time.perf_counter()
+        scores = reranker.score(question, [embedding_text(c) for c, _, _ in fused[:depth]])
+        self.timings['rerank_ms'] = (time.perf_counter() - t) * 1000
+        order = sorted(range(depth), key=lambda i: -scores[i]) + list(range(depth, len(fused)))
         out = []
         for new_rank, i in enumerate(order, start=1):
             c, _, r = fused[i]
-            out.append(RetrievedChunk(chunk=c, retriever="hybrid_rerank", rank=new_rank, score=scores[i],
+            out.append(RetrievedChunk(chunk=c, retriever="hybrid_rerank", rank=new_rank, score=scores[i] if i < depth else 0,
                                       component_ranks={**r, "hybrid": i + 1}))
         return out
 
 
 def select_context(
-    retrieved: list[RetrievedChunk], max_chunks: int, token_budget: int, site_id: str, corpus_id: str
+    retrieved: list[RetrievedChunk], max_chunks: int, token_budget: int, site_id: str, corpus_id: str,
+    policy: str = 'ranked', corpus_chunks: list[ChunkRecord] | None = None,
 ) -> list[RetrievedChunk]:
     """Take ranked chunks in order within the chunk and token budgets (no truncation mid-chunk)."""
+    for item in retrieved:
+        _check_isolation(item.chunk, site_id, corpus_id)
+    if policy == 'diverse':
+        # Soft section diversity: allow two chunks per section first, then fill remaining space.
+        first, deferred, sections = [], [], {}
+        for item in retrieved:
+            key = (item.chunk.source_url, item.chunk.anchor, tuple(item.chunk.heading_path))
+            sections[key] = sections.get(key, 0) + 1
+            (first if sections[key] <= 2 else deferred).append(item)
+        retrieved = first + deferred
+    elif policy == 'neighbors':
+        by_position = {(c.page_id, c.ordinal): c for c in corpus_chunks or []}
+        expanded = []
+        for item in retrieved:
+            expanded.append(item)
+            if item.rank <= 3:
+                for offset in (-1, 1):
+                    c = by_position.get((item.chunk.page_id, item.chunk.ordinal + offset))
+                    if c and c.anchor == item.chunk.anchor and c.heading_path == item.chunk.heading_path:
+                        _check_isolation(c, site_id, corpus_id)
+                        expanded.append(RetrievedChunk(chunk=c, retriever='neighbor', rank=item.rank,
+                                                       score=item.score, component_ranks={'neighbor_of_rank': item.rank}))
+        retrieved = expanded
+    elif policy != 'ranked':
+        raise RagError(ErrorCode.CONFIG_INVALID, 'Unknown context policy.', stage='context')
     selected: list[RetrievedChunk] = []
     used = 0
     seen: set[str] = set()
+    selected_text: list[str] = []
     for item in retrieved:
         _check_isolation(item.chunk, site_id, corpus_id)
         if item.chunk.chunk_id in seen:
+            continue
+        normalized = ' '.join(item.chunk.text.split())
+        if policy != 'ranked' and any(normalized in text for text in selected_text):
             continue
         if used + item.chunk.token_count > token_budget:
             continue  # a later, smaller chunk may still fit
         selected.append(item)
         seen.add(item.chunk.chunk_id)
+        selected_text.append(normalized)
         used += item.chunk.token_count
         if len(selected) >= max_chunks:
             break

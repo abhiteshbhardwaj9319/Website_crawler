@@ -14,6 +14,7 @@ def settings(tmp_path: Path) -> Settings:
     return Settings(
         _env_file=None,
         data_dir=tmp_path / "data",
+        retrieval_mode="hybrid",  # unit fixtures inject embeddings, not a downloaded reranker
         OPENAI_API_KEY="sk" + "-test-openai-000000000000",
         GROQ_API_KEY="gsk" + "_testgroq000000000000",
     )

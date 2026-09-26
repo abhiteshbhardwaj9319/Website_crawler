@@ -1,0 +1,59 @@
+{
+  "question": "What command creates a new Scrapy project?",
+  "corpus": "scrapy-docs-2-19--20260926T002328-527e90",
+  "note": "Disk/OS cache not cleared. Two observations; no network model download.",
+  "rows": [
+    {
+      "condition": "fresh_process_cached_models_on_disk",
+      "verify_store_ms": 1045.3,
+      "retrieval_ms": 3617.43,
+      "context_ms": 0.33,
+      "stages_ms": {
+        "embedding_model_load_ms": 551.8562000070233,
+        "query_embedding_ms": 11.357399984262884,
+        "dense_ms": 314.34089998947456,
+        "lexical_ms": 426.75330000929534,
+        "reranker_model_load_ms": 474.68809998827055,
+        "rerank_ms": 1837.640800018562
+      },
+      "context_ids": [
+        "ef4e8b123e1bfa92fc334611",
+        "b3d39d8b4e60884f6f745227",
+        "a2565f12ffffbbc10e35259d",
+        "b7873623102b807000570b1f",
+        "84ffa1f9f07f296b8a0431ab",
+        "5c0623b3df6b7cb9023b73c4",
+        "889bd006c2773d199d54135b",
+        "65dd4ffb2dba27800e03ea44",
+        "4d02836732b159e7a087449f",
+        "90a05be7474b025ea79d53ee"
+      ]
+    },
+    {
+      "condition": "warm_same_process",
+      "verify_store_ms": 1.49,
+      "retrieval_ms": 2608.41,
+      "context_ms": 0.34,
+      "stages_ms": {
+        "embedding_model_load_ms": 0.049700000090524554,
+        "query_embedding_ms": 33.34029999678023,
+        "dense_ms": 189.10310001228936,
+        "lexical_ms": 7.571099995402619,
+        "reranker_model_load_ms": 0.14859999646432698,
+        "rerank_ms": 2377.732200024184
+      },
+      "context_ids": [
+        "ef4e8b123e1bfa92fc334611",
+        "b3d39d8b4e60884f6f745227",
+        "a2565f12ffffbbc10e35259d",
+        "b7873623102b807000570b1f",
+        "84ffa1f9f07f296b8a0431ab",
+        "5c0623b3df6b7cb9023b73c4",
+        "889bd006c2773d199d54135b",
+        "65dd4ffb2dba27800e03ea44",
+        "4d02836732b159e7a087449f",
+        "90a05be7474b025ea79d53ee"
+      ]
+    }
+  ]
+}
